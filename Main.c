@@ -12,12 +12,12 @@ int main(int argc, char *argv[]) {
     memset(buffer,'\0', 1024);
 
     int iHttpNum = encDisObject.pf__encryption(
-        (unsigned char* )"Hello world!!!!!!cccc",
+        (unsigned char*)"Hello world!!!!!!cccc",
         strlen((char *)"Hello world!!!!!!cccc"),
         buffer,
         &iLen,
         tag,
-        (unsigned char* )"AES_256_GCM"
+        (unsigned char*)"AES_256_GCM"
     );
 
     if (iHttpNum == 200) {

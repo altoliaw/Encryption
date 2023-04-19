@@ -2,13 +2,16 @@
 
 static int AES_256_GCM_encryption(Encode* ,const unsigned char*, const int, unsigned char*, int*, unsigned char*);
 static int AES_256_GCM_decryption(Encode* ,const unsigned char*, const int, unsigned char*, int*, unsigned char*);
+static int AES_256_GCM_generateMasterKey(unsigned char*);
+static int AES_256_GCM_getMasterKey(AES_256_GCM*);
+static int AES_256_GCM_getIV(AES_256_GCM*);
 
 void AES_256_GCM__constructor(AES_256_GCM* a2gObject) {
     Encode__extension(&(a2gObject->o_Encode));
     (a2gObject->o_Encode).pf__encryption = &AES_256_GCM_encryption;
     (a2gObject->o_Encode).pf__decryption = &AES_256_GCM_decryption;
-    a2gObject->masterKey = (unsigned char*)"0123456789abcdef0123456789abcdef";
-    a2gObject->ivValue = (unsigned char*)"0123456789ab";
+    AES_256_GCM_getMasterKey(&a2gObject);
+    AES_256_GCM_getIV(&a2gObject);
 }
 
 void AES_256_GCM__destructor(const AES_256_GCM*) {
@@ -180,4 +183,46 @@ static int AES_256_GCM_decryption(
     } else {
         return 500;
     }
+}
+
+/**
+ * AES_256_GCM master key generation approach
+ *
+ * @param masterKey unsigned char* The master key
+ * @return int HTTP response status codes, more information can be referred
+ * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+ */
+static int AES_256_GCM_generateMasterKey(unsigned char* masterKey) {
+    int httpStatus = 0;
+    httpStatus = RAND_bytes(masterKey, sizeof(masterKey));
+    httpStatus = (httpStatus == 1) ? 200 : 500;
+    return httpStatus;
+}
+
+/**
+ * Obtaining the AES_256_GCM master key
+ *
+ * @param a2gObject AES_256_GCM* The address of the AES_256_GCM instance
+ * @return int HTTP response status codes, more information can be referred
+ * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+ */
+static int AES_256_GCM_getMasterKey(AES_256_GCM* a2gObject) {
+    int httpStatus = 0;
+    memcpy(a2gObject->masterKey,"0123456789abcdef0123456789abcdef", KEY_SIZE);
+    httpStatus = 200;
+    return httpStatus;
+}
+
+/**
+ * Obtaining the AES_256_GCM IV value
+ *
+ * @param a2gObject AES_256_GCM* The address of the AES_256_GCM instance
+ * @return int HTTP response status codes, more information can be referred
+ * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+ */
+static int AES_256_GCM_getIV(AES_256_GCM* a2gObject) {
+    int httpStatus = 0;
+    memcpy(a2gObject->ivValue,"0123456789ab", IV_SIZE);
+    httpStatus = 200;
+    return httpStatus;
 }

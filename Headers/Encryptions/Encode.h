@@ -19,17 +19,6 @@ struct Encode {
   // Public variables to constructor/destructor functions
   int (*pf__encryption)(Encode*, const unsigned char*, const int, unsigned char*, int*, unsigned char*);
   int (*pf__decryption)(Encode*, const unsigned char*, const int, unsigned char*, int*, unsigned char*);
-
-
-  // Protected variables
-  unsigned char* priKey;
-  unsigned char* priKeyLoc;
-
-  // Protected variables to constructor/destructor functions
-  void (*pf_getPrivKey)(unsigned char*);
-  int (*pf_checkPrivKeyExisted)();
-  int (*pf_generatePrivKey)(unsigned char*);
-
 };
 
 // Method declarations

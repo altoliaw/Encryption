@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <openssl/evp.h>
+#include <openssl/rand.h>
 
 #define KEY_SIZE 32 // 256 bits
 #define IV_SIZE 12 // 96 bits
@@ -28,9 +29,9 @@ struct AES_256_GCM {
   Encode o_Encode;
 
   // Protected variables
-  unsigned char* masterKey;
+  unsigned char masterKey[KEY_SIZE];
   unsigned char* masterKeyLoc;
-  unsigned char* ivValue;
+  unsigned char ivValue[IV_SIZE];
   unsigned char* ivValueLoc;
 };
 

@@ -10,11 +10,65 @@
       "-fmessage-length=0",
       "-pthread",
       "-o",
-      "/home/nick/Workspace/C/AppEncode/Sources/Encryptions/EncodeDispatcher.o",
-      "/home/nick/Workspace/C/AppEncode/Sources/Encryptions/EncodeDispatcher.c"
+      "/home/nick/Workspace/C/Encryption/Main.o",
+      "/home/nick/Workspace/C/Encryption/Main.c"
     ],
-    "directory": "/home/nick/Workspace/C/AppEncode",
-    "file": "/home/nick/Workspace/C/AppEncode/Sources/Encryptions/EncodeDispatcher.c",
-    "output": "/home/nick/Workspace/C/AppEncode/Sources/Encryptions/EncodeDispatcher.o"
+    "directory": "/home/nick/Workspace/C/Encryption",
+    "file": "/home/nick/Workspace/C/Encryption/Main.c",
+    "output": "/home/nick/Workspace/C/Encryption/Main.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-std=c99",
+      "-O3",
+      "-g3",
+      "-Wall",
+      "-c",
+      "-fmessage-length=0",
+      "-pthread",
+      "-o",
+      "/home/nick/Workspace/C/Encryption/Sources/Encryptions/EncodeDispatcher.o",
+      "/home/nick/Workspace/C/Encryption/Sources/Encryptions/EncodeDispatcher.c"
+    ],
+    "directory": "/home/nick/Workspace/C/Encryption",
+    "file": "/home/nick/Workspace/C/Encryption/Sources/Encryptions/EncodeDispatcher.c",
+    "output": "/home/nick/Workspace/C/Encryption/Sources/Encryptions/EncodeDispatcher.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-std=c99",
+      "-O3",
+      "-g3",
+      "-Wall",
+      "-c",
+      "-fmessage-length=0",
+      "-pthread",
+      "-o",
+      "/home/nick/Workspace/C/Encryption/Sources/Encryptions/Encode.o",
+      "/home/nick/Workspace/C/Encryption/Sources/Encryptions/Encode.c"
+    ],
+    "directory": "/home/nick/Workspace/C/Encryption",
+    "file": "/home/nick/Workspace/C/Encryption/Sources/Encryptions/Encode.c",
+    "output": "/home/nick/Workspace/C/Encryption/Sources/Encryptions/Encode.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-std=c99",
+      "-O3",
+      "-g3",
+      "-Wall",
+      "-c",
+      "-fmessage-length=0",
+      "-pthread",
+      "-o",
+      "/home/nick/Workspace/C/Encryption/Sources/Encryptions/AES_256_GCM.o",
+      "/home/nick/Workspace/C/Encryption/Sources/Encryptions/AES_256_GCM.c"
+    ],
+    "directory": "/home/nick/Workspace/C/Encryption",
+    "file": "/home/nick/Workspace/C/Encryption/Sources/Encryptions/AES_256_GCM.c",
+    "output": "/home/nick/Workspace/C/Encryption/Sources/Encryptions/AES_256_GCM.o"
   }
 ]
