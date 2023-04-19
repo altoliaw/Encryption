@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "stdio.h": "c",
+        "encode.h": "c",
+        "header.h": "c",
+        "bio.h": "c",
+        "encodedispatcher.h": "c",
+        "aes_256_gcm.h": "c"
+    },
+    "sonarlint.pathToCompileCommands": "${workspaceFolder}/.vscode/compile_commands.json"
+}
