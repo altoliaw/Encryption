@@ -3,9 +3,10 @@
         "stdio.h": "c",
         "encode.h": "c",
         "header.h": "c",
-        "bio.h": "c",
         "encodedispatcher.h": "c",
-        "aes_256_gcm.h": "c"
+        "aes_256_gcm.h": "c",
+        "filegeneration.h": "c"
     },
-    "sonarlint.pathToCompileCommands": "${workspaceFolder}/.vscode/compile_commands.json"
+    "sonarlint.pathToCompileCommands": "${workspaceFolder}/.vscode/compile_commands.json",
+    "C_Cpp.errorSquiggles": "disabled"
 }

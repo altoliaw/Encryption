@@ -5,13 +5,15 @@ static int AES_256_GCM_decryption(Encode* ,const unsigned char*, const int, unsi
 static int AES_256_GCM_generateMasterKey(unsigned char*);
 static int AES_256_GCM_getMasterKey(AES_256_GCM*);
 static int AES_256_GCM_getIV(AES_256_GCM*);
+static int AES_256_GCM_CheckFileExisted(AES_256_GCM*);
 
 void AES_256_GCM__constructor(AES_256_GCM* a2gObject) {
     Encode__extension(&(a2gObject->o_Encode));
     (a2gObject->o_Encode).pf__encryption = &AES_256_GCM_encryption;
     (a2gObject->o_Encode).pf__decryption = &AES_256_GCM_decryption;
-    AES_256_GCM_getMasterKey(&a2gObject);
-    AES_256_GCM_getIV(&a2gObject);
+    a2gObject->pf__checkFileExisted = &AES_256_GCM_CheckFileExisted;
+    AES_256_GCM_getMasterKey(a2gObject);
+    AES_256_GCM_getIV(a2gObject);
 }
 
 void AES_256_GCM__destructor(const AES_256_GCM*) {
@@ -60,7 +62,7 @@ static int AES_256_GCM_encryption(
     }
 
     // Set the GCM with the IV_SIZE
-    if(EVP_CIPHER_CTX_ctrl(ecCtx, EVP_CTRL_GCM_SET_IVLEN, IV_SIZE, NULL) != 1) {
+    if(EVP_CIPHER_CTX_ctrl(ecCtx, EVP_CTRL_GCM_SET_IVLEN, AES_256_GCM_IV_SIZE, NULL) != 1) {
         printf("EVP_CIPHER_CTX_ctrl\n");
         EVP_CIPHER_CTX_free(ecCtx);
         return 500;
@@ -122,7 +124,7 @@ static int AES_256_GCM_decryption(
     int* plaintextLen,
     unsigned char* authTag) {
 
-    AES_256_GCM const* pA2gObject = (AES_256_GCM*) pEnc;
+    AES_256_GCM* pA2gObject = (AES_256_GCM*) pEnc;
     unsigned char const* key = pA2gObject->masterKey;
     unsigned char const* iv =  pA2gObject->ivValue;
     int currentLen = 0;
@@ -144,7 +146,7 @@ static int AES_256_GCM_decryption(
     }
 
     // Set iv length
-    if(!EVP_CIPHER_CTX_ctrl(ecCtx, EVP_CTRL_GCM_SET_IVLEN, IV_SIZE, NULL)) {
+    if(!EVP_CIPHER_CTX_ctrl(ecCtx, EVP_CTRL_GCM_SET_IVLEN, AES_256_GCM_IV_SIZE, NULL)) {
         EVP_CIPHER_CTX_free(ecCtx);
         return 500;
     }
@@ -156,7 +158,7 @@ static int AES_256_GCM_decryption(
     }
 
     // Providing the authenticated tag
-    if(!EVP_CIPHER_CTX_ctrl(ecCtx, EVP_CTRL_GCM_SET_TAG, TAG_SIZE, authTag)) {
+    if(!EVP_CIPHER_CTX_ctrl(ecCtx, EVP_CTRL_GCM_SET_TAG, AES_256_GCM_TAG_SIZE, authTag)) {
         EVP_CIPHER_CTX_free(ecCtx);
         return 500;
     }
@@ -176,6 +178,10 @@ static int AES_256_GCM_decryption(
     EVP_CIPHER_CTX_free(ecCtx);
 
     *plaintextLen = plainLen;
+
+    int result = 0;
+    result = AES_256_GCM_CheckFileExisted(pA2gObject);
+
 
     // Checking if the decrypted result was successful
     if(decryptedStatus > 0) {
@@ -208,7 +214,7 @@ static int AES_256_GCM_generateMasterKey(unsigned char* masterKey) {
  */
 static int AES_256_GCM_getMasterKey(AES_256_GCM* a2gObject) {
     int httpStatus = 0;
-    memcpy(a2gObject->masterKey,"0123456789abcdef0123456789abcdef", KEY_SIZE);
+    memcpy(a2gObject->masterKey,"0123456789abcdef0123456789abcdef", AES_256_GCM_KEY_SIZE);
     httpStatus = 200;
     return httpStatus;
 }
@@ -222,7 +228,19 @@ static int AES_256_GCM_getMasterKey(AES_256_GCM* a2gObject) {
  */
 static int AES_256_GCM_getIV(AES_256_GCM* a2gObject) {
     int httpStatus = 0;
-    memcpy(a2gObject->ivValue,"0123456789ab", IV_SIZE);
+    memcpy(a2gObject->ivValue,"0123456789ab", AES_256_GCM_IV_SIZE);
     httpStatus = 200;
     return httpStatus;
 }
+
+/**
+ *
+ */
+static int AES_256_GCM_CheckFileExisted(AES_256_GCM*) {
+    int flag = 200; // false flag
+    FileGeneration fileGeneration;
+    FileGeneration__constructor(&fileGeneration);
+    fileGeneration.pf__checkFileExisted(AES_256_GCM_KEY_LOCATION);
+    return flag;
+}
+

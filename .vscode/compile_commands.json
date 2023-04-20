@@ -70,5 +70,23 @@
     "directory": "/home/nick/Workspace/C/Encryption",
     "file": "/home/nick/Workspace/C/Encryption/Sources/Encryptions/AES_256_GCM.c",
     "output": "/home/nick/Workspace/C/Encryption/Sources/Encryptions/AES_256_GCM.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-std=c99",
+      "-O3",
+      "-g3",
+      "-Wall",
+      "-c",
+      "-fmessage-length=0",
+      "-pthread",
+      "-o",
+      "/home/nick/Workspace/C/Encryption/Sources/FileGenerations/FileGeneration.o",
+      "/home/nick/Workspace/C/Encryption/Sources/FileGenerations/FileGeneration.c"
+    ],
+    "directory": "/home/nick/Workspace/C/Encryption",
+    "file": "/home/nick/Workspace/C/Encryption/Sources/FileGenerations/FileGeneration.c",
+    "output": "/home/nick/Workspace/C/Encryption/Sources/FileGenerations/FileGeneration.o"
   }
 ]

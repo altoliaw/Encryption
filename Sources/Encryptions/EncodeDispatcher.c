@@ -4,7 +4,7 @@ static int EncodeDispatcher_encryption (const unsigned char*, const int, unsigne
 static int EncodeDispatcher_decryption (const unsigned char*, const int, unsigned char*, int*, unsigned char*, unsigned char*);
 static int (*EncodeDispatcher_encryptedDispatcher(unsigned char*, Encode*))(Encode*, const unsigned char*, const int, unsigned char*, int*, unsigned char*);
 static int (*EncodeDispatcher_decryptedDispatcher(unsigned char*, Encode*))(Encode*, const unsigned char*, const int, unsigned char*, int*, unsigned char*);
-static Encode* CreateEncryptedObject(unsigned char*);
+static Encode* EncodeDispatcher_createEncryptedObject(unsigned char*);
 
 void EncodeDispatcher__constructor(EncodeDispatcher* encObject) {
     encObject->pf__encryption = &EncodeDispatcher_encryption;
@@ -36,7 +36,7 @@ static int EncodeDispatcher_encryption (
     unsigned char* approach) {
 
     Encode* pEnc = NULL;
-    pEnc = CreateEncryptedObject(approach);
+    pEnc = EncodeDispatcher_createEncryptedObject(approach);
 
     // Definition of function variable & execution of the function
     int (*dispatcher)(Encode*, const unsigned char*, const int, unsigned char*, int*, unsigned char*);
@@ -68,7 +68,7 @@ static int EncodeDispatcher_decryption (
     ) {
 
     Encode* pEnc = NULL;
-    pEnc = CreateEncryptedObject(approach);
+    pEnc = EncodeDispatcher_createEncryptedObject(approach);
 
     // Definition of function variable & execution of the function
     int (*dispatcher)(Encode*, const unsigned char*, const int, unsigned char*, int*, unsigned char*);
@@ -147,7 +147,7 @@ static int (*EncodeDispatcher_decryptedDispatcher(unsigned char* approach, Encod
  * @param approach unsigned char* The approach for encryption
  * @return Encode* The address of the parent object shall be passed
  */
-static Encode* CreateEncryptedObject(unsigned char* approach) {
+static Encode* EncodeDispatcher_createEncryptedObject(unsigned char* approach) {
     Encode* pObject = NULL;
 
     if (!strcmp((char*)approach, "AES_256_GCM")) {

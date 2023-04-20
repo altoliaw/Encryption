@@ -38,12 +38,14 @@ run:
 ${Prdir}/${PjN}: 	${Prdir}/Main.o \
 					${Sources}/Encryptions/EncodeDispatcher.o \
 					${Sources}/Encryptions/Encode.o \
-					${Sources}/Encryptions/AES_256_GCM.o
+					${Sources}/Encryptions/AES_256_GCM.o \
+					${Sources}/FileGenerations/FileGeneration.o
 
 	${Cmp} ${Stdlib} ${Cmpopt} ${Detinfo} ${Wall} ${Fsg} -o ${Prdir}/${PjN} ${Prdir}/Main.o \
 	${Sources}/Encryptions/EncodeDispatcher.o \
 	${Sources}/Encryptions/Encode.o \
 	${Sources}/Encryptions/AES_256_GCM.o \
+	${Sources}/FileGenerations/FileGeneration.o \
 	-lssl -lcrypto
 
 # Main
@@ -59,5 +61,9 @@ ${Sources}/Encryptions/Encode.o:	${Headers}/Encryptions/Encode.h ${Headers}/Encr
 	${Cmp} ${Stdlib} ${Cmpopt} ${Detinfo} ${Wall} ${Sources}/Encryptions/Encode.c -c ${Fsg} -o ${Sources}/Encryptions/Encode.o
 
 # AES_256_GCM
-${Sources}/Encryptions/AES_256_GCM.o:	${Headers}/Encryptions/AES_256_GCM.h ${Headers}/Encryptions/Encode.h ${Sources}/Encryptions/AES_256_GCM.c
+${Sources}/Encryptions/AES_256_GCM.o:	${Headers}/FileGenerations/FileGeneration.h ${Headers}/Encryptions/AES_256_GCM.h ${Headers}/Encryptions/Encode.h ${Sources}/Encryptions/AES_256_GCM.c
 	${Cmp} ${Stdlib} ${Cmpopt} ${Detinfo} ${Wall} ${Sources}/Encryptions/AES_256_GCM.c -c ${Fsg} -o ${Sources}/Encryptions/AES_256_GCM.o
+
+# FileGeneration
+${Sources}/FileGenerations/FileGeneration.o:	${Headers}/FileGenerations/FileGeneration.h ${Sources}/FileGenerations/FileGeneration.c
+	${Cmp} ${Stdlib} ${Cmpopt} ${Detinfo} ${Wall} ${Sources}/FileGenerations/FileGeneration.c -c ${Fsg} -o ${Sources}/FileGenerations/FileGeneration.o
