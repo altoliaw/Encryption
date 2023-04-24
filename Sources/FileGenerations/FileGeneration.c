@@ -3,7 +3,7 @@
 static int FileGeneration_checkFileExisted(unsigned char*);
 static int FileGeneration_getProjectPath(unsigned char*);
 static int FileGeneration_makeDir(unsigned char*);
-static int FileGeneration_writeFile(unsigned char*, unsigned char*, int, unsigned char*);
+static int FileGeneration_writeFile(unsigned char*, unsigned char const*, int, unsigned char*);
 static int FileGeneration_readFile(unsigned char*, unsigned char*, unsigned char*, int, int);
 
 // Method definitions
@@ -196,7 +196,7 @@ static int FileGeneration_makeDir(unsigned char* dirPath)
  */
 static int FileGeneration_writeFile (
     unsigned char* filePath,
-    unsigned char* contents,
+    unsigned char const* contents,
     int contentsLen,
     unsigned char* mode)
 {

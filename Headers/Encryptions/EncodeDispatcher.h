@@ -19,7 +19,7 @@ struct EncodeDispatcher {
 
   // Public variables to constructor/destructor functions
   int (*pf__encryption)(const unsigned char*, const int, unsigned char*, int*, unsigned char*, unsigned char*);
-  int (*pf__decryption)(const unsigned char*, const int, unsigned char*, int*, unsigned char*, unsigned char*);
+  int (*pf__decryption)(unsigned char*, int, unsigned char*, int*, unsigned char*, unsigned char*);
   int (*pf__initializeServerKey)(unsigned char*);
 };
 

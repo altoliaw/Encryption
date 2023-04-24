@@ -11,11 +11,13 @@ int main(int argc, char *argv[]) {
     encDisObject.pf__initializeServerKey((unsigned char*)"AES_256_GCM");
 
     int iLen = 0;
-    unsigned char buffer[1024];
+    unsigned char buffer[2060];
     unsigned char tag[16];
-    memset(buffer,'\0', 1024);
-    unsigned char* str = (unsigned char*)"a is apple; b is bear; c is cake; d is doll; e is egg; f is flower";
+    memset(buffer,'\0', 2060);
+    unsigned char* str = (unsigned char*)"a is apple;a is apple;a is apple;a is apple;a is apple;a is apple;a is apple;a is apple;a is apple;a is apple;a is apple;a is apple;a is apple;a is apple;a is apple;";
     int iHttpNum = 0;
+    printf("The plaintext is %d\n", (int)strlen((char*)str));
+
     iHttpNum = encDisObject.pf__encryption(
         str,
         (int)strlen((char *)str),
@@ -25,18 +27,17 @@ int main(int argc, char *argv[]) {
         (unsigned char*)"AES_256_GCM"
     );
 
-    printf("en iHttpNum is %d\n", iHttpNum);
+
     if (iHttpNum == 200) {
         printf("The ciphertext is  %s\n", buffer);
         printf("The length of the cipherText %d\n", iLen);
     }
 
     //================================================================
-
-    unsigned char decryptedBuffer[1024];
-    memset(decryptedBuffer,'\0', 1024);
+    printf("========================================================\n");
+    unsigned char decryptedBuffer[2060];
+    memset(decryptedBuffer,'\0', 2060);
     int iDLen = 0;
-    iHttpNum = 0;
 
     iHttpNum = encDisObject.pf__decryption(
         buffer,
@@ -47,11 +48,11 @@ int main(int argc, char *argv[]) {
         (unsigned char* )"AES_256_GCM"
     );
 
+    printf("en iHttpNum is %d\n", iHttpNum);
     if (iHttpNum == 200) {
         printf("The plaintext is %s\n", decryptedBuffer);
         printf("The length of the plainText %d\n", iDLen);
     }
-
 
    return 0;
 }

@@ -1,10 +1,10 @@
 #include "../../Headers/Encryptions/EncodeDispatcher.h"
 
 static int EncodeDispatcher_encryption(const unsigned char*, const int, unsigned char*, int*, unsigned char*, unsigned char*);
-static int EncodeDispatcher_decryption(const unsigned char*, const int, unsigned char*, int*, unsigned char*, unsigned char*);
+static int EncodeDispatcher_decryption(unsigned char*, int, unsigned char*, int*, unsigned char*, unsigned char*);
 static int EncodeDispatcher_initializeServerKey(unsigned char*);
 static int (*EncodeDispatcher_encryptedDispatcher(unsigned char*, Encode*))(Encode*, const unsigned char*, const int, unsigned char*, int*, unsigned char*);
-static int (*EncodeDispatcher_decryptedDispatcher(unsigned char*, Encode*))(Encode*, const unsigned char*, const int, unsigned char*, int*, unsigned char*);
+static int (*EncodeDispatcher_decryptedDispatcher(unsigned char*, Encode*))(Encode*, unsigned char*, int, unsigned char*, int*, unsigned char*);
 static int (*EncodeDispatcher_initializeServerKeyDispatcher(unsigned char*, Encode*))(Encode*);
 static Encode* EncodeDispatcher_createEncryptedObject(unsigned char*);
 
@@ -65,8 +65,8 @@ static int EncodeDispatcher_encryption(
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
 static int EncodeDispatcher_decryption(
-    const unsigned char* ciphertext,
-    const int ciphertextLen,
+    unsigned char* ciphertext,
+    int ciphertextLen,
     unsigned char* plaintext,
     int* plaintextLen,
     unsigned char* authTag,
@@ -77,7 +77,7 @@ static int EncodeDispatcher_decryption(
     pEnc = EncodeDispatcher_createEncryptedObject(approach);
 
     // Definition of function variable & execution of the function
-    int (*dispatcher)(Encode*, const unsigned char*, const int, unsigned char*, int*, unsigned char*);
+    int (*dispatcher)(Encode*, unsigned char*, int, unsigned char*, int*, unsigned char*);
     dispatcher = EncodeDispatcher_decryptedDispatcher(approach, pEnc);
     int httpStatus = dispatcher(pEnc, ciphertext, ciphertextLen, plaintext, plaintextLen, authTag);
 
@@ -150,8 +150,8 @@ static int (*EncodeDispatcher_encryptedDispatcher(unsigned char* approach, Encod
  */
 static int (*EncodeDispatcher_decryptedDispatcher(unsigned char* approach, Encode* pEnc))(
     Encode* pEnc,
-    const unsigned char* ciphertext,
-    const int ciphertextLen,
+    unsigned char* ciphertext,
+    int ciphertextLen,
     unsigned char* plaintext,
     int* plaintextLen,
     unsigned char* authTag)

@@ -32,7 +32,7 @@ struct FileGeneration {
   int (*pf__checkFileExisted)(unsigned char*);
   int (*pf__getProjectPath)(unsigned char*);
   int (*pf__makeDir)(unsigned char*);
-  int (*pf__writeFile)(unsigned char*, unsigned char*, int, unsigned char*);
+  int (*pf__writeFile)(unsigned char*, unsigned char const*, int, unsigned char*);
   int (*pf__readFile)(unsigned char*, unsigned char*, unsigned char*, int, int);
 };
 

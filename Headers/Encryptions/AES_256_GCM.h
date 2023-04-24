@@ -34,7 +34,6 @@ struct AES_256_GCM {
 
   // Protected variables
   unsigned char masterKey[AES_256_GCM_KEY_SIZE];
-  unsigned char ivValue[AES_256_GCM_IV_SIZE];
 };
 
 // Method declarations
