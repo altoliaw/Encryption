@@ -5,7 +5,8 @@
         "header.h": "c",
         "encodedispatcher.h": "c",
         "aes_256_gcm.h": "c",
-        "filegeneration.h": "c"
+        "filegeneration.h": "c",
+        "stat.h": "c"
     },
     "sonarlint.pathToCompileCommands": "${workspaceFolder}/.vscode/compile_commands.json",
     "C_Cpp.errorSquiggles": "disabled"

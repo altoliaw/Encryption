@@ -1,52 +1,135 @@
 #include "../../Headers/FileGenerations/FileGeneration.h"
 
-static int FileGeneration_checkFileExisted(char*);
+static int FileGeneration_checkFileExisted(unsigned char*);
 static int FileGeneration_getProjectPath(unsigned char*);
-static int FileGeneration_makeDir(const char*);
+static int FileGeneration_makeDir(unsigned char*);
+static int FileGeneration_writeFile(unsigned char*, unsigned char*, int, unsigned char*);
+static int FileGeneration_readFile(unsigned char*, unsigned char*, unsigned char*, int, int);
 
 // Method definitions
-void FileGeneration__constructor(FileGeneration* oFG) {
+void FileGeneration__constructor(FileGeneration* oFG)
+{
     oFG->pf__checkFileExisted = &FileGeneration_checkFileExisted;
+    oFG->pf__getProjectPath = &FileGeneration_getProjectPath;
+    oFG->pf__makeDir = &FileGeneration_makeDir;
+    oFG->pf__writeFile = &FileGeneration_writeFile;
+    oFG->pf__readFile = &FileGeneration_readFile;
 }
-void FileGeneration__destructor(const FileGeneration*) {
+void FileGeneration__destructor(const FileGeneration*)
+{
     // TODO
 }
 
-static int FileGeneration_checkFileExisted(char* filePath) {
+/**
+ * Checking the file existence. If the file exists
+ * @param filePath unsigned char* The path of the file
+ * @return int HTTP response status codes, more information can be referred
+ * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+ */
+static int FileGeneration_checkFileExisted(unsigned char* filePath)
+{
     // Parsing the filePath, and generate the folder location and file name
     // Finding the last appearance of the character '/'
-    char* loc =  NULL;
-    loc = strrchr(filePath, '/');
+    char* loc = NULL;
+    loc = strrchr((char*)filePath, '/');
 
     unsigned char projectPath[256];
     unsigned char* fileNameLoc = NULL;
     FileGeneration_getProjectPath(projectPath);
 
-
-    if(loc == NULL) { // If strrchr finds nothing, then the address of fileNameLoc is equal to the one of filePath.
-        fileNameLoc = (unsigned char*)filePath;
-    } else {// Concatenate substring of filePath to projectPath
+    // If strrchr finds nothing, then the address of fileNameLoc is equal to the one of filePath.
+    if (loc == NULL) {
+        fileNameLoc = filePath;
+    } else { // Concatenate substring of filePath to projectPath
         int length = 0;
         length = (int)strlen((char*)projectPath);
-        projectPath[length++] = '/';
-        for(int i = 0; i < (loc - filePath); i++) {
+        projectPath[length++] = (unsigned char)'/';
+
+        for (int i = 0; i < (((unsigned char*)loc) - filePath); i++) {
             projectPath[length] = *(filePath + i);
             length++;
         }
-        projectPath[length] = '\0';
+        projectPath[length] = (unsigned char)'\0';
         fileNameLoc = (unsigned char*)(loc + 1);
     }
-    printf("dirLoc is %s\n; and the length is %d\n", projectPath, (int)strlen(projectPath));
-    printf("fileNameLoc is %s\n", fileNameLoc);
 
-    int flag = 200;
-    #if defined(_WIN32) || defined(_WIN64)
+    int flag = 500;
+#if defined(_WIN32) || defined(_WIN64)
     // Windows
+    int length = 0;
+    length = (int)strlen((char*)projectPath);
+    projectPath[length++] = '/';
+    projectPath[length++] = '*';
+    projectPath[length++] = '\0';
 
-    #else
+    WIN32_FIND_DATA data = NULL;
+    HANDLE handler = NULL;
+
+    // If there exist files in the directory
+    if ((handler = FindFirstFile(projectPath.c_str(), &data)) != INVALID_HANDLE_VALUE) {
+        do {
+            char* individualFile = data.cFileName;
+            if (strcmp(individualFile, ".") == 0 || strcmp(individualFile, "..") == 0) {
+                continue;
+            }
+
+            // Assemble the file name
+            unsigned char tempProjectPath[256];
+            memcpy(tempProjectPath, projectPath, (sizeof(unsigned char) * sizeof(projectPath)));
+            int length = 0;
+            length = (int)strlen((char*)tempProjectPath);
+            tempProjectPath[length - 1] = (unsigned char)'\0';
+            strcat((char*)tempProjectPath, (char*)fileNameLoc);
+
+            // Determining items; there are two types of items; one is folder type, the other is file type.
+            const bool dir = (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+            if (dir == true) {
+                continue;
+            } else {
+                flag = 200;
+                break;
+            }
+
+        } while (FindNextFile(handler, &data) != 0);
+        FindClose(handler);
+    }
+#else
     // Linux
+    DIR* dirCurrent = opendir((char*)projectPath);
+    const struct dirent* dirent = NULL;
+    struct stat status;
 
-    #endif
+    // Iterations of the directory that users specified
+    while ((dirent = readdir(dirCurrent)) != NULL) {
+        // Fetching all the files in the directory
+        const char* individualFile = dirent->d_name;
+        if (strcmp(individualFile, ".") == 0 || strcmp(individualFile, "..") == 0) {
+            continue;
+        }
+
+        // Simulations of the path of the directory
+        unsigned char tempProjectPath[256];
+        memcpy(tempProjectPath, projectPath, (sizeof(unsigned char) * sizeof(projectPath)));
+        int length = 0;
+        length = (int)strlen((char*)tempProjectPath);
+        tempProjectPath[length++] = (unsigned char)'/';
+        tempProjectPath[length] = (unsigned char)'\0';
+        strcat((char*)tempProjectPath, (char*)fileNameLoc);
+
+        // If the file path does not exist (stat will return -1; otherwise 0).
+        if (stat((char*)tempProjectPath, &status) == -1) {
+            continue;
+        }
+
+        // Determining the stuff of the path shall not belong to the folder type
+        const int isDir = (status.st_mode & __S_IFDIR) != 0;
+        if (isDir == 0) {
+            flag = 200;
+            break;
+        }
+    }
+    closedir(dirCurrent);
+#endif
     return flag;
 }
 
@@ -58,45 +141,115 @@ static int FileGeneration_checkFileExisted(char* filePath) {
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
-static int FileGeneration_getProjectPath(unsigned char* projectPath) {
+static int FileGeneration_getProjectPath(unsigned char* projectPath)
+{
     int flag = 200;
     char buffer[256];
-    #if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32) || defined(_WIN64)
     // Windows
-    if(GetCurrentDirectory( 256, buffer) == 0) {
-        flag =500;
+    if ((int)GetCurrentDirectory(sizeof(char) * sizeof(buffer), buffer) == 0) {
+        flag = 500;
     }
-    #else
+#else
     // Linux
-    if(getcwd(buffer, sizeof(buffer)) == NULL) {
-        flag =500;
+    if (getcwd(buffer, sizeof(char) * sizeof(buffer)) == NULL) {
+        flag = 500;
     }
-    #endif
+#endif
 
-    if(flag == 200) {
-        memcpy(projectPath, buffer, sizeof(buffer));
+    if (flag == 200) {
+        memcpy(projectPath, buffer, (sizeof(buffer) * sizeof(char)));
     }
     return flag;
 }
 
 /**
- * Create a new directory
+ * Creating a new directory
  *
  * @param dirPath The path containing the directory
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
-static int FileGeneration_makeDir(const char* dirPath) {
-
+static int FileGeneration_makeDir(unsigned char* dirPath)
+{
     int flag = 200;
-    #if defined(_WIN32) || defined(_WIN64)
-    if (mkdir(dirPath) != 0) {
+#if defined(_WIN32) || defined(_WIN64)
+    if (mkdir((char*)dirPath) != 0) {
         flag = 500;
     }
-    #else
-    if (mkdir(dirPath, S_IRWXU | S_IRUSR | S_IRWXO) != 0) {
+#else
+    if (mkdir((char*)dirPath, S_IRWXU | S_IRUSR | S_IRWXO) != 0) {
         flag = 500;
     }
-    #endif
+#endif
+    return flag;
+}
+
+/**
+ * Writing the contents into the specified directory.
+ *
+ * @param filePath unsigned char* The path of the file for writing
+ * @param contents unsigned char* The contents
+ * @param mode unsigned char* The fwrite mode in C
+ * @return int HTTP response status codes, more information can be referred
+ * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+ */
+static int FileGeneration_writeFile (
+    unsigned char* filePath,
+    unsigned char* contents,
+    int contentsLen,
+    unsigned char* mode)
+{
+    int flag = 200;
+    FILE* pFilePtr = NULL;
+    pFilePtr = fopen((char*)filePath, (char*)mode);
+
+    if (pFilePtr == NULL) {
+        flag = 500;
+    } else {
+        fwrite(contents, 1, contentsLen, pFilePtr);
+        fclose(pFilePtr);
+    }
+
+    return flag;
+}
+
+/**
+ * Reading the contents into the specified directory.
+ *
+ * @param filePath unsigned char* The path of the file for writing
+ * @param buffer unsigned char* The contents in the file by using call-by the value of address,
+ * the buffer size shall be defined in the calling function.
+ * @param mode unsigned char* The fopen mode in C
+ * @param startPos int The start position in the file; the value is generally to be 1.
+ * @param contentsLen int The length that users want to read from the file
+ * @return int HTTP response status codes, more information can be referred
+ * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+ */
+static int FileGeneration_readFile (
+    unsigned char* filePath,
+    unsigned char* buffer,
+    unsigned char* mode,
+    int startPos,
+    int contentsLen
+    )
+{
+    int flag = 200;
+    FILE* pFilePtr = NULL;
+    pFilePtr = fopen((char*)filePath, (char*)mode);
+
+    if (pFilePtr == NULL) {
+        flag = 500;
+    } else {
+        flag = (int)fread(buffer, startPos, contentsLen, pFilePtr);
+        fclose(pFilePtr);
+        if (flag >=0) {
+            flag = 200;
+        }
+        else {
+            flag = 500;
+        }
+    }
+
     return flag;
 }

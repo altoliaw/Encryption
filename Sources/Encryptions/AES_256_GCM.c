@@ -1,22 +1,33 @@
 #include "../../Headers/Encryptions/AES_256_GCM.h"
 
-static int AES_256_GCM_encryption(Encode* ,const unsigned char*, const int, unsigned char*, int*, unsigned char*);
-static int AES_256_GCM_decryption(Encode* ,const unsigned char*, const int, unsigned char*, int*, unsigned char*);
-static int AES_256_GCM_generateMasterKey(unsigned char*);
+static int AES_256_GCM_encryption(Encode*, const unsigned char*, const int, unsigned char*, int*, unsigned char*);
+static int AES_256_GCM_decryption(Encode*, const unsigned char*, const int, unsigned char*, int*, unsigned char*);
+static int AES_256_GCM_initializeMasterKey(Encode*);
+static int AES_256_GCM_generateMasterKey(AES_256_GCM*);
 static int AES_256_GCM_getMasterKey(AES_256_GCM*);
 static int AES_256_GCM_getIV(AES_256_GCM*);
-static int AES_256_GCM_CheckFileExisted(AES_256_GCM*);
+static int AES_256_GCM_CheckFileExisted();
+static int AES_256_GCM_readKeyFile(AES_256_GCM*);
 
-void AES_256_GCM__constructor(AES_256_GCM* a2gObject) {
+
+void AES_256_GCM__constructor(AES_256_GCM* a2gObject)
+{
+    // Inheritance
     Encode__extension(&(a2gObject->o_Encode));
+    // Class methods overloading (parent class)
     (a2gObject->o_Encode).pf__encryption = &AES_256_GCM_encryption;
     (a2gObject->o_Encode).pf__decryption = &AES_256_GCM_decryption;
+    (a2gObject->o_Encode).pf__initializeServerKey = &AES_256_GCM_initializeMasterKey;
+    a2gObject->masterKey[0] = '\0';
+
+    // Class methods
     a2gObject->pf__checkFileExisted = &AES_256_GCM_CheckFileExisted;
     AES_256_GCM_getMasterKey(a2gObject);
     AES_256_GCM_getIV(a2gObject);
 }
 
-void AES_256_GCM__destructor(const AES_256_GCM*) {
+void AES_256_GCM__destructor(const AES_256_GCM*)
+{
     // Destructor function
 }
 
@@ -33,50 +44,51 @@ void AES_256_GCM__destructor(const AES_256_GCM*) {
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
 static int AES_256_GCM_encryption(
-        Encode* pEnc,
-        const unsigned char* plaintext,
-        const int plaintextLen,
-        unsigned char* ciphertext,
-        int* ciphertextLen,
-        unsigned char* authTag) {
+    Encode* pEnc,
+    const unsigned char* plaintext,
+    const int plaintextLen,
+    unsigned char* ciphertext,
+    int* ciphertextLen,
+    unsigned char* authTag)
+{
 
-    AES_256_GCM const* pA2gObject = (AES_256_GCM*) pEnc;
+    AES_256_GCM const* pA2gObject = (AES_256_GCM*)pEnc;
     unsigned char const* key = pA2gObject->masterKey;
-    unsigned char const* iv =  pA2gObject->ivValue;
+    unsigned char const* iv = pA2gObject->ivValue;
     int currentLen = 0;
     int cipherLen = 0;
 
-    EVP_CIPHER_CTX *ecCtx;
+    EVP_CIPHER_CTX* ecCtx;
 
     // New an instance
-    if(!(ecCtx = EVP_CIPHER_CTX_new())) {
+    if (!(ecCtx = EVP_CIPHER_CTX_new())) {
         printf("EVP_CIPHER_CTX_new\n");
         return 500;
     }
 
     // Initialize encryption approach
-    if(EVP_EncryptInit_ex(ecCtx, EVP_aes_256_gcm(), NULL, NULL, NULL) != 1) {
+    if (EVP_EncryptInit_ex(ecCtx, EVP_aes_256_gcm(), NULL, NULL, NULL) != 1) {
         printf("EVP_EncryptInit_ex\n");
         EVP_CIPHER_CTX_free(ecCtx);
         return 500;
     }
 
     // Set the GCM with the IV_SIZE
-    if(EVP_CIPHER_CTX_ctrl(ecCtx, EVP_CTRL_GCM_SET_IVLEN, AES_256_GCM_IV_SIZE, NULL) != 1) {
+    if (EVP_CIPHER_CTX_ctrl(ecCtx, EVP_CTRL_GCM_SET_IVLEN, AES_256_GCM_IV_SIZE, NULL) != 1) {
         printf("EVP_CIPHER_CTX_ctrl\n");
         EVP_CIPHER_CTX_free(ecCtx);
         return 500;
     }
 
     // Set the encryption key and iv values
-    if(EVP_EncryptInit_ex(ecCtx, NULL, NULL, key, iv) != 1) {
+    if (EVP_EncryptInit_ex(ecCtx, NULL, NULL, key, iv) != 1) {
         printf("EVP_EncryptInit_ex\n");
         EVP_CIPHER_CTX_free(ecCtx);
         return 500;
     }
 
     // Encryption process
-    if(EVP_EncryptUpdate(ecCtx, ciphertext, &currentLen, plaintext, plaintextLen) != 1){
+    if (EVP_EncryptUpdate(ecCtx, ciphertext, &currentLen, plaintext, plaintextLen) != 1) {
         printf("EVP_EncryptUpdate\n");
         EVP_CIPHER_CTX_free(ecCtx);
         return 500;
@@ -84,7 +96,7 @@ static int AES_256_GCM_encryption(
     cipherLen = currentLen;
 
     // The last encryption of GCM
-    if(EVP_EncryptFinal_ex(ecCtx, ciphertext + currentLen, &currentLen) != 1) {
+    if (EVP_EncryptFinal_ex(ecCtx, ciphertext + currentLen, &currentLen) != 1) {
         printf("EVP_EncryptFinal_ex\n");
         EVP_CIPHER_CTX_free(ecCtx);
         return 500;
@@ -92,7 +104,7 @@ static int AES_256_GCM_encryption(
     cipherLen += currentLen;
 
     // Insert authentication tag
-    if(EVP_CIPHER_CTX_ctrl(ecCtx, EVP_CTRL_GCM_GET_TAG, 16, authTag)!= 1) {
+    if (EVP_CIPHER_CTX_ctrl(ecCtx, EVP_CTRL_GCM_GET_TAG, 16, authTag) != 1) {
         EVP_CIPHER_CTX_free(ecCtx);
         return 500;
     }
@@ -122,11 +134,12 @@ static int AES_256_GCM_decryption(
     const int ciphertextLen,
     unsigned char* plaintext,
     int* plaintextLen,
-    unsigned char* authTag) {
+    unsigned char* authTag)
+{
 
-    AES_256_GCM* pA2gObject = (AES_256_GCM*) pEnc;
+    AES_256_GCM const* pA2gObject = (AES_256_GCM*)pEnc;
     unsigned char const* key = pA2gObject->masterKey;
-    unsigned char const* iv =  pA2gObject->ivValue;
+    unsigned char const* iv = pA2gObject->ivValue;
     int currentLen = 0;
     int plainLen = 0;
     int decryptedStatus = 0;
@@ -134,37 +147,37 @@ static int AES_256_GCM_decryption(
     EVP_CIPHER_CTX* ecCtx;
 
     // New an instance
-    if(!(ecCtx = EVP_CIPHER_CTX_new())) {
+    if (!(ecCtx = EVP_CIPHER_CTX_new())) {
         printf("EVP_CIPHER_CTX_new\n");
         return 500;
     }
 
     // Initialise the decryption operation
-    if(!EVP_DecryptInit_ex(ecCtx, EVP_aes_256_gcm(), NULL, NULL, NULL)) {
+    if (!EVP_DecryptInit_ex(ecCtx, EVP_aes_256_gcm(), NULL, NULL, NULL)) {
         EVP_CIPHER_CTX_free(ecCtx);
         return 500;
     }
 
     // Set iv length
-    if(!EVP_CIPHER_CTX_ctrl(ecCtx, EVP_CTRL_GCM_SET_IVLEN, AES_256_GCM_IV_SIZE, NULL)) {
+    if (!EVP_CIPHER_CTX_ctrl(ecCtx, EVP_CTRL_GCM_SET_IVLEN, AES_256_GCM_IV_SIZE, NULL)) {
         EVP_CIPHER_CTX_free(ecCtx);
         return 500;
     }
 
     // Initializing key and iv
-    if(!EVP_DecryptInit_ex(ecCtx, NULL, NULL, key, iv)) {
+    if (!EVP_DecryptInit_ex(ecCtx, NULL, NULL, key, iv)) {
         EVP_CIPHER_CTX_free(ecCtx);
         return 500;
     }
 
     // Providing the authenticated tag
-    if(!EVP_CIPHER_CTX_ctrl(ecCtx, EVP_CTRL_GCM_SET_TAG, AES_256_GCM_TAG_SIZE, authTag)) {
+    if (!EVP_CIPHER_CTX_ctrl(ecCtx, EVP_CTRL_GCM_SET_TAG, AES_256_GCM_TAG_SIZE, authTag)) {
         EVP_CIPHER_CTX_free(ecCtx);
         return 500;
     }
 
     // Decrypting plaintext
-    if(!EVP_DecryptUpdate(ecCtx, plaintext, &currentLen, ciphertext, ciphertextLen)) {
+    if (!EVP_DecryptUpdate(ecCtx, plaintext, &currentLen, ciphertext, ciphertextLen)) {
         EVP_CIPHER_CTX_free(ecCtx);
         return 500;
     }
@@ -180,11 +193,11 @@ static int AES_256_GCM_decryption(
     *plaintextLen = plainLen;
 
     int result = 0;
-    result = AES_256_GCM_CheckFileExisted(pA2gObject);
-
+    result = AES_256_GCM_CheckFileExisted();
+    printf("The file exists: %d\n", result);
 
     // Checking if the decrypted result was successful
-    if(decryptedStatus > 0) {
+    if (decryptedStatus > 0) {
         return 200;
     } else {
         return 500;
@@ -194,14 +207,25 @@ static int AES_256_GCM_decryption(
 /**
  * AES_256_GCM master key generation approach
  *
- * @param masterKey unsigned char* The master key
+ * @param a2gObject AES_256_GCM* The address of the AES_256_GCM instance
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
-static int AES_256_GCM_generateMasterKey(unsigned char* masterKey) {
+static int AES_256_GCM_generateMasterKey(AES_256_GCM* a2gObject)
+{
     int httpStatus = 0;
-    httpStatus = RAND_bytes(masterKey, sizeof(masterKey));
+    httpStatus = RAND_bytes(a2gObject->masterKey, AES_256_GCM_KEY_SIZE);
     httpStatus = (httpStatus == 1) ? 200 : 500;
+    if (httpStatus == 200) {
+        FileGeneration fileGeneration;
+        FileGeneration__constructor(&fileGeneration);
+        httpStatus = fileGeneration.pf__writeFile(
+            (unsigned char*)AES_256_GCM_KEY_LOCATION,
+            a2gObject->masterKey,
+            (int)sizeof(a2gObject->masterKey),
+            (unsigned char*)"wb");
+    }
+
     return httpStatus;
 }
 
@@ -212,9 +236,14 @@ static int AES_256_GCM_generateMasterKey(unsigned char* masterKey) {
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
-static int AES_256_GCM_getMasterKey(AES_256_GCM* a2gObject) {
-    int httpStatus = 0;
-    memcpy(a2gObject->masterKey,"0123456789abcdef0123456789abcdef", AES_256_GCM_KEY_SIZE);
+static int AES_256_GCM_getMasterKey(AES_256_GCM* a2gObject)
+{
+    int httpStatus = 500;
+    int tmpKeyLength =0;
+    tmpKeyLength = (int)strlen((char*)a2gObject->masterKey);
+    if(tmpKeyLength <= 0) {
+        AES_256_GCM_readKeyFile(a2gObject);
+    }
     httpStatus = 200;
     return httpStatus;
 }
@@ -226,21 +255,67 @@ static int AES_256_GCM_getMasterKey(AES_256_GCM* a2gObject) {
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
-static int AES_256_GCM_getIV(AES_256_GCM* a2gObject) {
-    int httpStatus = 0;
-    memcpy(a2gObject->ivValue,"0123456789ab", AES_256_GCM_IV_SIZE);
+static int AES_256_GCM_getIV(AES_256_GCM* a2gObject)
+{
+    int httpStatus = 500;
+    memcpy(a2gObject->ivValue, "0123456789ab", AES_256_GCM_IV_SIZE);
     httpStatus = 200;
     return httpStatus;
 }
 
 /**
+ * Checking if the master key file exists
  *
+ * @return int HTTP response status codes, more information can be referred
+ * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
-static int AES_256_GCM_CheckFileExisted(AES_256_GCM*) {
-    int flag = 200; // false flag
+static int AES_256_GCM_CheckFileExisted()
+{
+    int httpStatus = 500; // false flag
     FileGeneration fileGeneration;
     FileGeneration__constructor(&fileGeneration);
-    fileGeneration.pf__checkFileExisted(AES_256_GCM_KEY_LOCATION);
-    return flag;
+    httpStatus = fileGeneration.pf__checkFileExisted((unsigned char*)AES_256_GCM_KEY_LOCATION);
+
+    return httpStatus;
 }
 
+/**
+ * Reading the key file
+ *
+ * @return int HTTP response status codes, more information can be referred
+ * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+ */
+static int AES_256_GCM_readKeyFile(AES_256_GCM* a2gObject)
+{
+    int httpStatus = 500;
+    FileGeneration fileGeneration;
+    FileGeneration__constructor(&fileGeneration);
+    if (AES_256_GCM_CheckFileExisted() == 200)
+    {
+        fileGeneration.pf__readFile((unsigned char*)AES_256_GCM_KEY_LOCATION,
+        a2gObject->masterKey,
+        (unsigned char*)"rb",
+        1,
+        AES_256_GCM_KEY_SIZE);
+    } else {
+        httpStatus = 500;
+    }
+
+    return httpStatus;
+}
+
+
+/**
+ * Initialization of the key file in the installation process.
+ *
+ * @return int HTTP response status codes, more information can be referred
+ * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+ */
+static int AES_256_GCM_initializeMasterKey(Encode* pEnc)
+{
+    AES_256_GCM* a2gObject = NULL;
+    a2gObject = (AES_256_GCM*)pEnc;
+    int httpStatus = 500 ;
+    httpStatus = AES_256_GCM_generateMasterKey(a2gObject);
+    return httpStatus;
+}

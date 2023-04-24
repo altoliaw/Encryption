@@ -1,6 +1,9 @@
 #pragma once
 /**
- * A header of FileGenerations class
+ * A header of FileGenerations class; in the class, some methods related to directory
+ * and file generation are proposed. They include directory checking, file checking,
+ * file generation and directory generation. All methods are listed in the following
+ * declarations.
  *
  * @author Nick
  * @date 2023/4/20
@@ -26,7 +29,11 @@ typedef struct FileGeneration FileGeneration;
 
 // Class body
 struct FileGeneration {
-  int (*pf__checkFileExisted)(char* fileName);
+  int (*pf__checkFileExisted)(unsigned char*);
+  int (*pf__getProjectPath)(unsigned char*);
+  int (*pf__makeDir)(unsigned char*);
+  int (*pf__writeFile)(unsigned char*, unsigned char*, int, unsigned char*);
+  int (*pf__readFile)(unsigned char*, unsigned char*, unsigned char*, int, int);
 };
 
 // Method declarations

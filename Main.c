@@ -7,15 +7,18 @@ int main(int argc, char *argv[]) {
 
     static EncodeDispatcher encDisObject;
     EncodeDispatcher__constructor(&encDisObject);
+
+    encDisObject.pf__initializeServerKey((unsigned char*)"AES_256_GCM");
+
     int iLen = 0;
     unsigned char buffer[1024];
     unsigned char tag[16];
     memset(buffer,'\0', 1024);
-    unsigned char* str = "Louse is";
+    unsigned char* str = (unsigned char*)"a is apple; b is bear; c is cake; d is doll; e is egg; f is flower";
     int iHttpNum = 0;
     iHttpNum = encDisObject.pf__encryption(
         str,
-        strlen((char *)str),
+        (int)strlen((char *)str),
         buffer,
         &iLen,
         tag,
@@ -48,6 +51,7 @@ int main(int argc, char *argv[]) {
         printf("The plaintext is %s\n", decryptedBuffer);
         printf("The length of the plainText %d\n", iDLen);
     }
+
 
    return 0;
 }

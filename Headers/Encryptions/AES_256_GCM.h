@@ -16,7 +16,7 @@
 #define AES_256_GCM_KEY_SIZE 32 // 256 bits
 #define AES_256_GCM_IV_SIZE 12 // 96 bits
 #define AES_256_GCM_TAG_SIZE 16 // 128 bits
-#define AES_256_GCM_KEY_LOCATION ".privacy/.encryption.pem" // {project}/.privacy/.encryption.pem
+#define AES_256_GCM_KEY_LOCATION ".privacy/.encryptionAES256GCM.bin" // {project}/.privacy/.encryptionAES256GCM.bin
 
 // Files included
 #include "Encode.h"
@@ -34,9 +34,7 @@ struct AES_256_GCM {
 
   // Protected variables
   unsigned char masterKey[AES_256_GCM_KEY_SIZE];
-  unsigned char* masterKeyLoc;
   unsigned char ivValue[AES_256_GCM_IV_SIZE];
-  unsigned char* ivValueLoc;
 };
 
 // Method declarations

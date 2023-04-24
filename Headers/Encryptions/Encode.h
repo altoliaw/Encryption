@@ -19,6 +19,7 @@ struct Encode {
   // Public variables to constructor/destructor functions
   int (*pf__encryption)(Encode*, const unsigned char*, const int, unsigned char*, int*, unsigned char*);
   int (*pf__decryption)(Encode*, const unsigned char*, const int, unsigned char*, int*, unsigned char*);
+  int (*pf__initializeServerKey)(Encode*);
 };
 
 // Method declarations
