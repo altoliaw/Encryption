@@ -13,14 +13,14 @@
 #include <openssl/evp.h>
 #include <openssl/rand.h>
 
+// Files included
+#include "Encode.h"
+#include "../FileGenerations/FileGeneration.h"
+
 #define AES_256_GCM_KEY_SIZE 32 // 256 bits
 #define AES_256_GCM_IV_SIZE 12 // 96 bits
 #define AES_256_GCM_TAG_SIZE 16 // 128 bits
 #define AES_256_GCM_KEY_LOCATION ".privacy/.encryptionAES256GCM.bin" // {project}/.privacy/.encryptionAES256GCM.bin
-
-// Files included
-#include "Encode.h"
-#include "../FileGenerations/FileGeneration.h"
 
 // Class definition
 typedef struct AES_256_GCM AES_256_GCM;

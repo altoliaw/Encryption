@@ -33,7 +33,7 @@ static int FileGeneration_checkFileExisted(unsigned char* filePath)
     char* loc = NULL;
     loc = strrchr((char*)filePath, '/');
 
-    unsigned char projectPath[256];
+    unsigned char projectPath[FILEGENERATION_PROJECT_PATH_SIZE];
     unsigned char* fileNameLoc = NULL;
     FileGeneration_getProjectPath(projectPath);
 
@@ -74,7 +74,7 @@ static int FileGeneration_checkFileExisted(unsigned char* filePath)
             }
 
             // Assemble the file name
-            unsigned char tempProjectPath[256];
+            unsigned char tempProjectPath[FILEGENERATION_PROJECT_PATH_SIZE];
             memcpy(tempProjectPath, projectPath, (sizeof(unsigned char) * sizeof(projectPath)));
             int length = 0;
             length = (int)strlen((char*)tempProjectPath);
@@ -108,7 +108,7 @@ static int FileGeneration_checkFileExisted(unsigned char* filePath)
         }
 
         // Simulations of the path of the directory
-        unsigned char tempProjectPath[256];
+        unsigned char tempProjectPath[FILEGENERATION_PROJECT_PATH_SIZE];
         memcpy(tempProjectPath, projectPath, (sizeof(unsigned char) * sizeof(projectPath)));
         int length = 0;
         length = (int)strlen((char*)tempProjectPath);
@@ -143,24 +143,24 @@ static int FileGeneration_checkFileExisted(unsigned char* filePath)
  */
 static int FileGeneration_getProjectPath(unsigned char* projectPath)
 {
-    int flag = 200;
-    char buffer[256];
+    int httpStatus = 200;
+    char buffer[FILEGENERATION_PROJECT_PATH_SIZE];
 #if defined(_WIN32) || defined(_WIN64)
     // Windows
     if ((int)GetCurrentDirectory(sizeof(char) * sizeof(buffer), buffer) == 0) {
-        flag = 500;
+        httpStatus = 500;
     }
 #else
     // Linux
     if (getcwd(buffer, sizeof(char) * sizeof(buffer)) == NULL) {
-        flag = 500;
+        httpStatus = 500;
     }
 #endif
 
-    if (flag == 200) {
+    if (httpStatus == 200) {
         memcpy(projectPath, buffer, (sizeof(buffer) * sizeof(char)));
     }
-    return flag;
+    return httpStatus;
 }
 
 /**
@@ -172,17 +172,17 @@ static int FileGeneration_getProjectPath(unsigned char* projectPath)
  */
 static int FileGeneration_makeDir(unsigned char* dirPath)
 {
-    int flag = 200;
+    int httpStatus = 200;
 #if defined(_WIN32) || defined(_WIN64)
     if (mkdir((char*)dirPath) != 0) {
-        flag = 500;
+        httpStatus = 500;
     }
 #else
     if (mkdir((char*)dirPath, S_IRWXU | S_IRUSR | S_IRWXO) != 0) {
-        flag = 500;
+        httpStatus = 500;
     }
 #endif
-    return flag;
+    return httpStatus;
 }
 
 /**
@@ -200,18 +200,18 @@ static int FileGeneration_writeFile (
     int contentsLen,
     unsigned char* mode)
 {
-    int flag = 200;
+    int httpStatus = 200;
     FILE* pFilePtr = NULL;
     pFilePtr = fopen((char*)filePath, (char*)mode);
 
     if (pFilePtr == NULL) {
-        flag = 500;
+        httpStatus = 500;
     } else {
         fwrite(contents, 1, contentsLen, pFilePtr);
         fclose(pFilePtr);
     }
 
-    return flag;
+    return httpStatus;
 }
 
 /**
@@ -234,22 +234,22 @@ static int FileGeneration_readFile (
     int contentsLen
     )
 {
-    int flag = 200;
+    int httpStatus = 200;
     FILE* pFilePtr = NULL;
     pFilePtr = fopen((char*)filePath, (char*)mode);
 
     if (pFilePtr == NULL) {
-        flag = 500;
+        httpStatus = 500;
     } else {
-        flag = (int)fread(buffer, startPos, contentsLen, pFilePtr);
+        httpStatus = (int)fread(buffer, startPos, contentsLen, pFilePtr);
         fclose(pFilePtr);
-        if (flag >=0) {
-            flag = 200;
+        if (httpStatus >=0) {
+            httpStatus = 200;
         }
         else {
-            flag = 500;
+            httpStatus = 500;
         }
     }
 
-    return flag;
+    return httpStatus;
 }

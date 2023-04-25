@@ -18,7 +18,7 @@ void AES_256_GCM__constructor(AES_256_GCM* a2gObject)
     (a2gObject->o_Encode).pf__encryption = &AES_256_GCM_encryption;
     (a2gObject->o_Encode).pf__decryption = &AES_256_GCM_decryption;
     (a2gObject->o_Encode).pf__initializeServerKey = &AES_256_GCM_initializeMasterKey;
-    a2gObject->masterKey[0] = '\0';// Initialization
+    memset(a2gObject->masterKey, (unsigned char)'\0', AES_256_GCM_KEY_SIZE);
 
     // Class methods
     a2gObject->pf__checkFileExisted = &AES_256_GCM_CheckFileExisted;
@@ -121,21 +121,13 @@ static int AES_256_GCM_encryption(
         *ciphertextLen = cipherLen;
 
         // Adding the IV value into variable, cipherText and modifying the variable, cipherTextLen
+        // Due to SonarLint's suggestions, the size of the array shall be larger than 1.
         unsigned char tmpCipher[((unsigned int)cipherLen) + 1];
         memset(tmpCipher, (unsigned char)'\0', ((unsigned int)cipherLen) + 1);
-        for (int i = 0; i< *ciphertextLen; i++) {
-            tmpCipher [i] = ciphertext[i];
-        }
-        memset(ciphertext, (unsigned char)'\0', ((unsigned int)cipherLen + 1));
-        for (int i = 0; i< AES_256_GCM_IV_SIZE; i++) {
-            ciphertext[i] = iv[i];
-        }
-        for (int i = 0, j = AES_256_GCM_IV_SIZE; i< *ciphertextLen; i++) {
-            ciphertext[j++] = tmpCipher [i];
-            if (i == (*ciphertextLen -1)) {
-                ciphertext[j] = '\0';
-            }
-        }
+        memcpy(tmpCipher, ciphertext, cipherLen);
+        memset(ciphertext, (unsigned char)'\0', cipherLen);
+        memcpy(ciphertext, iv, AES_256_GCM_IV_SIZE);
+        memcpy((ciphertext + AES_256_GCM_IV_SIZE), tmpCipher, cipherLen);
         *ciphertextLen = *ciphertextLen + AES_256_GCM_IV_SIZE;
 
         return 200;
@@ -167,14 +159,18 @@ static int AES_256_GCM_decryption(
 
     AES_256_GCM const* pA2gObject = (AES_256_GCM*)pEnc;
     unsigned char const* key = pA2gObject->masterKey;
+
+    // Obtaining the IV value
     unsigned char iv[AES_256_GCM_IV_SIZE + 1];
     memset(iv, (unsigned char)'\0', AES_256_GCM_IV_SIZE + 1);
-    memcpy(iv, ciphertext, AES_256_GCM_IV_SIZE); // Obtaining the IV value
+    memcpy(iv, ciphertext, AES_256_GCM_IV_SIZE);
 
-    // Removing the IV value from the variable, cipherText
+    // Removing the IV value from the variable, "ciphertext"
     unsigned char tmpCipher[ciphertextLen + 1];
     memset(tmpCipher, (unsigned char)'\0', ciphertextLen + 1);
-    memcpy(tmpCipher, (ciphertext + AES_256_GCM_IV_SIZE), (ciphertextLen - AES_256_GCM_IV_SIZE)); // Copying and ignoring the IV value
+
+    // Copying and ignoring the IV value
+    memcpy(tmpCipher, (ciphertext + AES_256_GCM_IV_SIZE), (ciphertextLen - AES_256_GCM_IV_SIZE));
     memset(ciphertext, (unsigned char)'\0', ciphertextLen);
     memcpy(ciphertext, tmpCipher, (ciphertextLen - AES_256_GCM_IV_SIZE));
     ciphertextLen = (ciphertextLen - AES_256_GCM_IV_SIZE);
@@ -185,19 +181,19 @@ static int AES_256_GCM_decryption(
 
     EVP_CIPHER_CTX* ecCtx;
 
-    // New an instance
+    // Creating an instance
     if (!(ecCtx = EVP_CIPHER_CTX_new())) {
         printf("EVP_CIPHER_CTX_new\n");
         return 500;
     }
 
-    // Initialise the decryption operation
+    // Initializing the decryption operation
     if (!EVP_DecryptInit_ex(ecCtx, EVP_aes_256_gcm(), NULL, NULL, NULL)) {
         EVP_CIPHER_CTX_free(ecCtx);
         return 500;
     }
 
-    // Set iv length
+    // Setting iv length
     if (!EVP_CIPHER_CTX_ctrl(ecCtx, EVP_CTRL_GCM_SET_IVLEN, AES_256_GCM_IV_SIZE, NULL)) {
         EVP_CIPHER_CTX_free(ecCtx);
         return 500;
@@ -222,7 +218,7 @@ static int AES_256_GCM_decryption(
     }
     plainLen = currentLen;
 
-    // The last decryption of GCM
+    // The last decryption phase of GCM
     decryptedStatus = EVP_DecryptFinal_ex(ecCtx, plaintext + currentLen, &currentLen);
     plainLen += currentLen;
 

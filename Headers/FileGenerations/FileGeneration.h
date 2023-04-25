@@ -24,6 +24,8 @@
 #include <sys/types.h> // Iteration from a folder on linux platform
 #endif
 
+#define FILEGENERATION_PROJECT_PATH_SIZE 256 // 256 bits
+
 // Class declarations
 typedef struct FileGeneration FileGeneration;
 
