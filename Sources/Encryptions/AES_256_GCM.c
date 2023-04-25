@@ -244,7 +244,7 @@ static int AES_256_GCM_decryption(
  */
 static int AES_256_GCM_generateMasterKey(AES_256_GCM* a2gObject)
 {
-    int httpStatus = 0;
+    int httpStatus = 500;
     httpStatus = RAND_bytes(a2gObject->masterKey, AES_256_GCM_KEY_SIZE);
     httpStatus = (httpStatus == 1) ? 200 : 500;
     if (httpStatus == 200) {
@@ -280,7 +280,7 @@ static int AES_256_GCM_getMasterKey(AES_256_GCM* a2gObject)
 }
 
 /**
- * Obtaining the AES_256_GCM IV value
+ * Obtaining a random AES_256_GCM IV value
  *
  * @param pivValue unsigned char* The value of IV
  * @return int HTTP response status codes, more information can be referred
@@ -289,8 +289,9 @@ static int AES_256_GCM_getMasterKey(AES_256_GCM* a2gObject)
 static int AES_256_GCM_getIV(unsigned char* pivValue)
 {
     int httpStatus = 500;
-    memcpy(pivValue, (unsigned char*)"0123456789ab", AES_256_GCM_IV_SIZE + 1);
-    httpStatus = 200;
+    httpStatus = RAND_bytes(pivValue, AES_256_GCM_IV_SIZE);
+    httpStatus = (httpStatus == 1) ? 200 : 500;
+
     return httpStatus;
 }
 
