@@ -33,7 +33,7 @@ static int FileGeneration_checkFileExisted(unsigned char* filePath)
     char* loc = NULL;
     loc = strrchr((char*)filePath, '/');
 
-    unsigned char projectPath[FILEGENERATION_PROJECT_PATH_SIZE];
+    unsigned char projectPath[FILE_GENERATION_PROJECT_PATH_SIZE];
     unsigned char* fileNameLoc = NULL;
     FileGeneration_getProjectPath(projectPath);
 
@@ -74,7 +74,7 @@ static int FileGeneration_checkFileExisted(unsigned char* filePath)
             }
 
             // Assemble the file name
-            unsigned char tempProjectPath[FILEGENERATION_PROJECT_PATH_SIZE];
+            unsigned char tempProjectPath[FILE_GENERATION_PROJECT_PATH_SIZE];
             memcpy(tempProjectPath, projectPath, (sizeof(unsigned char) * sizeof(projectPath)));
             int length = 0;
             length = (int)strlen((char*)tempProjectPath);
@@ -108,7 +108,7 @@ static int FileGeneration_checkFileExisted(unsigned char* filePath)
         }
 
         // Simulations of the path of the directory
-        unsigned char tempProjectPath[FILEGENERATION_PROJECT_PATH_SIZE];
+        unsigned char tempProjectPath[FILE_GENERATION_PROJECT_PATH_SIZE];
         memcpy(tempProjectPath, projectPath, (sizeof(unsigned char) * sizeof(projectPath)));
         int length = 0;
         length = (int)strlen((char*)tempProjectPath);
@@ -144,7 +144,7 @@ static int FileGeneration_checkFileExisted(unsigned char* filePath)
 static int FileGeneration_getProjectPath(unsigned char* projectPath)
 {
     int httpStatus = 200;
-    char buffer[FILEGENERATION_PROJECT_PATH_SIZE];
+    char buffer[FILE_GENERATION_PROJECT_PATH_SIZE];
 #if defined(_WIN32) || defined(_WIN64)
     // Windows
     if ((int)GetCurrentDirectory(sizeof(char) * sizeof(buffer), buffer) == 0) {
