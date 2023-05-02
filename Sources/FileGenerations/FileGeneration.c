@@ -28,6 +28,7 @@ void FileGeneration__destructor(const FileGeneration*)
  */
 static int FileGeneration_checkFileExisted(unsigned char* filePath)
 {
+
     // Parsing the filePath, and generate the folder location and file name
     // Finding the last appearance of the character '/'
     char* loc = NULL;
@@ -194,7 +195,7 @@ static int FileGeneration_makeDir(unsigned char* dirPath)
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
-static int FileGeneration_writeFile (
+static int FileGeneration_writeFile(
     unsigned char* filePath,
     unsigned char const* contents,
     int contentsLen,
@@ -226,13 +227,12 @@ static int FileGeneration_writeFile (
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
-static int FileGeneration_readFile (
+static int FileGeneration_readFile(
     unsigned char* filePath,
     unsigned char* buffer,
     unsigned char* mode,
     int startPos,
-    int contentsLen
-    )
+    int contentsLen)
 {
     int httpStatus = 200;
     FILE* pFilePtr = NULL;
@@ -243,10 +243,9 @@ static int FileGeneration_readFile (
     } else {
         httpStatus = (int)fread(buffer, startPos, contentsLen, pFilePtr);
         fclose(pFilePtr);
-        if (httpStatus >=0) {
+        if (httpStatus >= 0) {
             httpStatus = 200;
-        }
-        else {
+        } else {
             httpStatus = 500;
         }
     }

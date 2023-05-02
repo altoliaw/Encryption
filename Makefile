@@ -11,6 +11,8 @@ Cmpopt=-O3
 Detinfo=-g3
 Wall=-Wall
 Fsg=-fmessage-length=0 -pthread
+#OpenSSL3=-I../../../include
+OpenSSL3=
 
 ## Project execution's name
 PjN:= $(word $(words $(subst /, ,${Prdir})), $(subst /, ,${Prdir}))
@@ -20,6 +22,9 @@ PjN:= $(word $(words $(subst /, ,${Prdir})), $(subst /, ,${Prdir}))
 
 .Phony: all
 all: ${Prdir}/${PjN}
+
+.Phony: build
+build: ${Prdir}/${PjN}/build
 
 .Phony: clean
 clean:
@@ -34,6 +39,12 @@ run:
 	${Prdir}/${PjN}
 
 ##================================================================
+# Build libraries
+${Prdir}/${PjN}/build : 	${Sources}/Encryptions/EncodeDispatcher.o \
+							${Sources}/Encryptions/Encode.o \
+							${Sources}/Encryptions/AES_256_GCM.o \
+							${Sources}/FileGenerations/FileGeneration.o
+
 # Create a module
 ${Prdir}/${PjN}: 	${Prdir}/Main.o \
 					${Sources}/Encryptions/EncodeDispatcher.o \
@@ -54,16 +65,16 @@ ${Prdir}/Main.o:	${Headers}/Header.h ${Headers}/Encryptions/EncodeDispatcher.h $
 
 # EncodeDispatcher
 ${Sources}/Encryptions/EncodeDispatcher.o:	${Headers}/Encryptions/EncodeDispatcher.h ${Headers}/Encryptions/Encode.h ${Headers}/Encryptions/AES_256_GCM.h ${Sources}/Encryptions/EncodeDispatcher.c
-	${Cmp} ${Stdlib} ${Cmpopt} ${Detinfo} ${Wall} ${Sources}/Encryptions/EncodeDispatcher.c -c ${Fsg} -o ${Sources}/Encryptions/EncodeDispatcher.o
+	${Cmp} ${Stdlib} ${Cmpopt} ${Detinfo} ${Wall} ${Sources}/Encryptions/EncodeDispatcher.c -c ${Fsg} -o ${Sources}/Encryptions/EncodeDispatcher.o ${OpenSSL3}
 
 # Encode
 ${Sources}/Encryptions/Encode.o:	${Headers}/Encryptions/Encode.h ${Headers}/Encryptions/Encode.h ${Headers}/Encryptions/AES_256_GCM.h ${Sources}/Encryptions/Encode.c
-	${Cmp} ${Stdlib} ${Cmpopt} ${Detinfo} ${Wall} ${Sources}/Encryptions/Encode.c -c ${Fsg} -o ${Sources}/Encryptions/Encode.o
+	${Cmp} ${Stdlib} ${Cmpopt} ${Detinfo} ${Wall} ${Sources}/Encryptions/Encode.c -c ${Fsg} -o ${Sources}/Encryptions/Encode.o ${OpenSSL3}
 
 # AES_256_GCM
 ${Sources}/Encryptions/AES_256_GCM.o:	${Headers}/FileGenerations/FileGeneration.h ${Headers}/Encryptions/AES_256_GCM.h ${Headers}/Encryptions/Encode.h ${Sources}/Encryptions/AES_256_GCM.c
-	${Cmp} ${Stdlib} ${Cmpopt} ${Detinfo} ${Wall} ${Sources}/Encryptions/AES_256_GCM.c -c ${Fsg} -o ${Sources}/Encryptions/AES_256_GCM.o
+	${Cmp} ${Stdlib} ${Cmpopt} ${Detinfo} ${Wall} ${Sources}/Encryptions/AES_256_GCM.c -c ${Fsg} -o ${Sources}/Encryptions/AES_256_GCM.o ${OpenSSL3}
 
 # FileGeneration
 ${Sources}/FileGenerations/FileGeneration.o:	${Headers}/FileGenerations/FileGeneration.h ${Sources}/FileGenerations/FileGeneration.c
-	${Cmp} ${Stdlib} ${Cmpopt} ${Detinfo} ${Wall} ${Sources}/FileGenerations/FileGeneration.c -c ${Fsg} -o ${Sources}/FileGenerations/FileGeneration.o
+	${Cmp} ${Stdlib} ${Cmpopt} ${Detinfo} ${Wall} ${Sources}/FileGenerations/FileGeneration.c -c ${Fsg} -o ${Sources}/FileGenerations/FileGeneration.o ${OpenSSL3}

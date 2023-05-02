@@ -348,6 +348,11 @@ static int AES_256_GCM_initializeMasterKey(Encode* pEnc)
     AES_256_GCM* a2gObject = NULL;
     a2gObject = (AES_256_GCM*)pEnc;
     int httpStatus = 500 ;
-    httpStatus = AES_256_GCM_generateMasterKey(a2gObject);
+    httpStatus = AES_256_GCM_CheckFileExisted();
+
+    if(httpStatus == 500) {
+        httpStatus = AES_256_GCM_generateMasterKey(a2gObject);
+    }
+
     return httpStatus;
 }
