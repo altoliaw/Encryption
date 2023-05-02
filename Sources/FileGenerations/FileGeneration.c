@@ -63,11 +63,11 @@ static int FileGeneration_checkFileExisted(unsigned char* filePath)
     projectPath[length++] = '*';
     projectPath[length++] = '\0';
 
-    WIN32_FIND_DATA data = NULL;
+    WIN32_FIND_DATA data;
     HANDLE handler = NULL;
 
     // If there exist files in the directory
-    if ((handler = FindFirstFile(projectPath.c_str(), &data)) != INVALID_HANDLE_VALUE) {
+    if ((handler = FindFirstFile((char*)projectPath, &data)) != INVALID_HANDLE_VALUE) {
         do {
             char* individualFile = data.cFileName;
             if (strcmp(individualFile, ".") == 0 || strcmp(individualFile, "..") == 0) {
@@ -83,8 +83,8 @@ static int FileGeneration_checkFileExisted(unsigned char* filePath)
             strcat((char*)tempProjectPath, (char*)fileNameLoc);
 
             // Determining items; there are two types of items; one is folder type, the other is file type.
-            const bool dir = (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
-            if (dir == true) {
+            const int dir = (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+            if (dir == 1) {
                 continue;
             } else {
                 flag = 200;
