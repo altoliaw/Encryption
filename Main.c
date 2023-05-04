@@ -1,14 +1,10 @@
-#include "./Headers/Header.h"
+//#include "./Headers/Header.h"
+#include "./Headers/Entry.h"
 
 /**
  * Main function
 */
 int main(int argc, char *argv[]) {
-
-    static EncodeDispatcher encDisObject;
-    EncodeDispatcher__constructor(&encDisObject);
-
-    encDisObject.pf__initializeServerKey((unsigned char*)"AES_256_GCM");
 
     int iLen = 0;
     unsigned char buffer[2060];
@@ -18,7 +14,7 @@ int main(int argc, char *argv[]) {
     int iHttpNum = 0;
     printf("The plaintext is %d\n", (int)strlen((char*)str));
 
-    iHttpNum = encDisObject.pf__encryption(
+    iHttpNum = ___encryption(
         str,
         (int)strlen((char *)str),
         buffer,
@@ -27,19 +23,18 @@ int main(int argc, char *argv[]) {
         (unsigned char*)"AES_256_GCM"
     );
 
-
     if (iHttpNum == 200) {
         printf("The ciphertext is  %s\n", buffer);
         printf("The length of the cipherText %d\n", iLen);
     }
 
-    //================================================================
+//    //================================================================
     printf("========================================================\n");
     unsigned char decryptedBuffer[2060];
     memset(decryptedBuffer,'\0', 2060);
     int iDLen = 0;
 
-    iHttpNum = encDisObject.pf__decryption(
+    iHttpNum = ___decryption(
         buffer,
         iLen,
         decryptedBuffer,
@@ -53,6 +48,5 @@ int main(int argc, char *argv[]) {
         printf("The plaintext is %s\n", decryptedBuffer);
         printf("The length of the plainText %d\n", iDLen);
     }
-
-   return 0;
+    return 0;
 }

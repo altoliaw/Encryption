@@ -1,5 +1,8 @@
 #include "./Headers/Entry.h"
 
+// Global variable
+static EncodeDispatcher __encDisObject__;
+
 /**
  * An entry point of encryption for dynamical links. (.so, or .dll)
  *
@@ -20,9 +23,7 @@ int ___encryption(
         unsigned char* tag,
         unsigned char* approach) {
 
-    if(__encDisObject__ != NULL){
-        EncodeDispatcher__constructor(&__encDisObject__);
-    }
+    EncodeDispatcher__constructor(&__encDisObject__);
 
     int httpStatus = 0;
     httpStatus = __encDisObject__.pf__encryption(
@@ -56,10 +57,7 @@ int ___decryption(
     unsigned char* tag,
     unsigned char* approach) {
 
-    if(__encDisObject__ != NULL){
-        EncodeDispatcher__constructor(&__encDisObject__);
-    }
-
+    EncodeDispatcher__constructor(&__encDisObject__);
     int httpStatus = 0;
     httpStatus = __encDisObject__.pf__decryption(
         ciphertext,

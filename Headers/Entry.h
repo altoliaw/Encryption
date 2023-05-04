@@ -19,6 +19,3 @@
   __attribute__((visibility("default"))) int ___encryption(const unsigned char*, const int, unsigned char*, int*, unsigned char*, unsigned char*);
   __attribute__((visibility("default"))) int ___decryption(unsigned char*, int, unsigned char*, int*, unsigned char*, unsigned char*);
 #endif
-
-// Global variable
-static EncodeDispatcher __encDisObject__;

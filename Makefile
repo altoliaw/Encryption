@@ -40,19 +40,22 @@ run:
 
 ##================================================================
 # Build libraries
-${Prdir}/${PjN}/build : 	${Sources}/Encryptions/EncodeDispatcher.o \
+${Prdir}/${PjN}/build : 	${Prdir}/Entry.o \
+							${Sources}/Encryptions/EncodeDispatcher.o \
 							${Sources}/Encryptions/Encode.o \
 							${Sources}/Encryptions/AES_256_GCM.o \
 							${Sources}/FileGenerations/FileGeneration.o
 
 # Create a module
 ${Prdir}/${PjN}: 	${Prdir}/Main.o \
+					${Prdir}/Entry.o \
 					${Sources}/Encryptions/EncodeDispatcher.o \
 					${Sources}/Encryptions/Encode.o \
 					${Sources}/Encryptions/AES_256_GCM.o \
 					${Sources}/FileGenerations/FileGeneration.o
 
 	${Cmp} ${Stdlib} ${Cmpopt} ${Detinfo} ${Wall} ${Fsg} -o ${Prdir}/${PjN} ${Prdir}/Main.o \
+	${Prdir}/Entry.o \
 	${Sources}/Encryptions/EncodeDispatcher.o \
 	${Sources}/Encryptions/Encode.o \
 	${Sources}/Encryptions/AES_256_GCM.o \
@@ -60,8 +63,12 @@ ${Prdir}/${PjN}: 	${Prdir}/Main.o \
 	-lssl -lcrypto
 
 # Main
-${Prdir}/Main.o:	${Headers}/Header.h ${Headers}/Encryptions/EncodeDispatcher.h ${Prdir}/Main.c
+${Prdir}/Main.o:	${Headers}/Entry.h ${Prdir}/Main.c
 	${Cmp} ${Stdlib} ${Cmpopt} ${Detinfo} ${Wall} ${Prdir}/Main.c -c ${Fsg} -o ${Prdir}/Main.o
+
+# Entry.o
+${Prdir}/Entry.o:	${Headers}/Entry.h ${Headers}/Header.h ${Headers}/Encryptions/EncodeDispatcher.h ${Prdir}/Entry.c
+	${Cmp} ${Stdlib} ${Cmpopt} ${Detinfo} ${Wall} ${Prdir}/Entry.c -c ${Fsg} -o ${Prdir}/Entry.o
 
 # EncodeDispatcher
 ${Sources}/Encryptions/EncodeDispatcher.o:	${Headers}/Encryptions/EncodeDispatcher.h ${Headers}/Encryptions/Encode.h ${Headers}/Encryptions/AES_256_GCM.h ${Sources}/Encryptions/EncodeDispatcher.c
