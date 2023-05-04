@@ -24,7 +24,7 @@ void EncodeDispatcher__destructor(const EncodeDispatcher*)
  * Encryption function
  *
  * @param plaintext const unsigned char* The plaintext source for encryption
- * @param sourceLen const int The length of the source string
+ * @param plaintextLen const int The length of the source string
  * @param ciphertext unsigned char* The ciphertext
  * @param ciphertextLen int* The length of the ciphertext string
  * @param authTag unsigned char* The authentication tag
