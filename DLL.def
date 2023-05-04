@@ -1,0 +1,7 @@
+/* The file is for DLL making in Mingw compiling on Windows only.
+ * This may avoid wrong DLL format when compiling
+ */
+extern "C" {
+    int __stdcall ___encryption(const unsigned char*, const int, unsigned char*, int*, unsigned char*, unsigned char*);
+    int __stdcall ___decryption(unsigned char*, int, unsigned char*, int*, unsigned char*, unsigned char*);
+}
