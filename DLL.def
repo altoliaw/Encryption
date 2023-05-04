@@ -1,7 +1,12 @@
 /* The file is for DLL making in Mingw compiling on Windows only.
  * This may avoid wrong DLL format when compiling
  */
+#ifdef __cplusplus
 extern "C" {
+#endif
     int __stdcall ___encryption(const unsigned char*, const int, unsigned char*, int*, unsigned char*, unsigned char*);
     int __stdcall ___decryption(unsigned char*, int, unsigned char*, int*, unsigned char*, unsigned char*);
+
+#ifdef __cplusplus
 }
+#endif
