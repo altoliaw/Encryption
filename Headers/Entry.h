@@ -13,8 +13,8 @@
 #include "Header.h"
 
 #if defined(_WIN32) || defined(_WIN64)
-  __attribute__((visibility("default"))) int ___encryption(const unsigned char*, const int, unsigned char*, int*, unsigned char*, unsigned char*);
-  __attribute__((visibility("default"))) int ___decryption(unsigned char*, int, unsigned char*, int*, unsigned char*, unsigned char*);
+  __declspec(dllexport) int ___encryption(const unsigned char*, const int, unsigned char*, int*, unsigned char*, unsigned char*);
+  __declspec(dllexport) int ___decryption(unsigned char*, int, unsigned char*, int*, unsigned char*, unsigned char*);
 #else
   __attribute__((visibility("default"))) int ___encryption(const unsigned char*, const int, unsigned char*, int*, unsigned char*, unsigned char*);
   __attribute__((visibility("default"))) int ___decryption(unsigned char*, int, unsigned char*, int*, unsigned char*, unsigned char*);
