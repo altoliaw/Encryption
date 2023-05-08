@@ -15,7 +15,7 @@ static EncodeDispatcher __encDisObject__;
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
-__declspec(dllexport) int ___encryption(
+int ___encryption(
         const unsigned char* plaintext,
         const int plaintextLen,
         unsigned char* ciphertext,
@@ -49,7 +49,7 @@ __declspec(dllexport) int ___encryption(
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
-__declspec(dllexport) int ___decryption(
+int ___decryption(
     unsigned char* ciphertext,
     int ciphertextLen,
     unsigned char* plaintext,
@@ -69,5 +69,3 @@ __declspec(dllexport) int ___decryption(
     );
     return httpStatus;
 }
-
-

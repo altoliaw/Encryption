@@ -13,9 +13,9 @@
 #include "Header.h"
 
 #if defined(_WIN32) || defined(_WIN64)
-
-  __declspec(dllexport) int __stdcall ___encryption(const unsigned char*, const int, unsigned char*, int*, unsigned char*, unsigned char*);
-  __declspec(dllexport) int __stdcall ___decryption(unsigned char*, int, unsigned char*, int*, unsigned char*, unsigned char*);
+  #define EXPORT __declspec(dllexport)
+  EXPORT int ___encryption(const unsigned char*, const int, unsigned char*, int*, unsigned char*, unsigned char*);
+  EXPORT int ___decryption(unsigned char*, int, unsigned char*, int*, unsigned char*, unsigned char*);
 
 #else
   __attribute__((visibility("default"))) int ___encryption(const unsigned char*, const int, unsigned char*, int*, unsigned char*, unsigned char*);
