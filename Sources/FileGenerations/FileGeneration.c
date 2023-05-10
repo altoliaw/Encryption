@@ -54,7 +54,7 @@ static int FileGeneration_checkFileExisted(unsigned char* filePath)
         fileNameLoc = (unsigned char*)(loc + 1);
     }
 
-    int flag = 500;
+    int httpStatus = 500;
 #if defined(_WIN32) || defined(_WIN64)
     // Windows
     int length = 0;
@@ -87,7 +87,7 @@ static int FileGeneration_checkFileExisted(unsigned char* filePath)
             if (dir == 1) {
                 continue;
             } else {
-                flag = 200;
+                httpStatus = 200;
                 break;
             }
 
@@ -125,13 +125,13 @@ static int FileGeneration_checkFileExisted(unsigned char* filePath)
         // Determining the stuff of the path shall not belong to the folder type
         const int isDir = (status.st_mode & __S_IFDIR) != 0;
         if (isDir == 0) {
-            flag = 200;
+            httpStatus = 200;
             break;
         }
     }
     closedir(dirCurrent);
 #endif
-    return flag;
+    return httpStatus;
 }
 
 /**
@@ -167,7 +167,7 @@ static int FileGeneration_getProjectPath(unsigned char* projectPath)
 /**
  * Creating a new directory
  *
- * @param dirPath The path containing the directory
+ * @param dirPath The path shall contain the directory which users want to create
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */

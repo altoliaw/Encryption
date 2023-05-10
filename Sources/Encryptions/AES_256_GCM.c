@@ -6,7 +6,7 @@ static int AES_256_GCM_initializeMasterKey(Encode*);
 static int AES_256_GCM_generateMasterKey(AES_256_GCM*);
 static int AES_256_GCM_getMasterKey(AES_256_GCM*);
 static int AES_256_GCM_getIV(unsigned char*);
-static int AES_256_GCM_CheckFileExisted();
+static int AES_256_GCM_checkFileExisted();
 static int AES_256_GCM_readKeyFile(AES_256_GCM*);
 
 
@@ -21,7 +21,7 @@ void AES_256_GCM__constructor(AES_256_GCM* a2gObject)
     memset(a2gObject->masterKey, (unsigned char)'\0', AES_256_GCM_KEY_SIZE);
 
     // Class methods
-    a2gObject->pf__checkFileExisted = &AES_256_GCM_CheckFileExisted;
+    a2gObject->pf__checkFileExisted = &AES_256_GCM_checkFileExisted;
     AES_256_GCM_getMasterKey(a2gObject);
 }
 
@@ -236,7 +236,9 @@ static int AES_256_GCM_decryption(
 }
 
 /**
- * AES_256_GCM master key generation approach
+ * AES_256_GCM master key generation approach; the generation consists of
+ * twp phases. The first phase is key generation; the second phase is writing the
+ * key information into the specified file.
  *
  * @param a2gObject AES_256_GCM* The address of the AES_256_GCM instance
  * @return int HTTP response status codes, more information can be referred
@@ -301,7 +303,7 @@ static int AES_256_GCM_getIV(unsigned char* pivValue)
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
-static int AES_256_GCM_CheckFileExisted()
+static int AES_256_GCM_checkFileExisted()
 {
     int httpStatus = 500; // false flag
     FileGeneration fileGeneration;
@@ -322,7 +324,7 @@ static int AES_256_GCM_readKeyFile(AES_256_GCM* a2gObject)
     int httpStatus = 500;
     FileGeneration fileGeneration;
     FileGeneration__constructor(&fileGeneration);
-    if (AES_256_GCM_CheckFileExisted() == 200)
+    if (AES_256_GCM_checkFileExisted() == 200)
     {
         fileGeneration.pf__readFile((unsigned char*)AES_256_GCM_KEY_LOCATION,
         a2gObject->masterKey,
@@ -348,7 +350,7 @@ static int AES_256_GCM_initializeMasterKey(Encode* pEnc)
     AES_256_GCM* a2gObject = NULL;
     a2gObject = (AES_256_GCM*)pEnc;
     int httpStatus = 500 ;
-    httpStatus = AES_256_GCM_CheckFileExisted();
+    httpStatus = AES_256_GCM_checkFileExisted();
 
     if(httpStatus == 500) {
         httpStatus = AES_256_GCM_generateMasterKey(a2gObject);
