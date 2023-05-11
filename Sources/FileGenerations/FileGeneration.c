@@ -5,6 +5,7 @@ static int FileGeneration_getProjectPath(unsigned char*);
 static int FileGeneration_makeDir(unsigned char*);
 static int FileGeneration_writeFile(unsigned char*, unsigned char const*, int, unsigned char*);
 static int FileGeneration_readFile(unsigned char*, unsigned char*, unsigned char*, int, int);
+static int FileGeneration_checkDirArchitecture(unsigned char*);
 
 // Method definitions
 void FileGeneration__constructor(FileGeneration* oFG)
@@ -14,6 +15,7 @@ void FileGeneration__constructor(FileGeneration* oFG)
     oFG->pf__makeDir = &FileGeneration_makeDir;
     oFG->pf__writeFile = &FileGeneration_writeFile;
     oFG->pf__readFile = &FileGeneration_readFile;
+    oFG->pf__checkDirArchitecture = &FileGeneration_checkDirArchitecture;
 }
 void FileGeneration__destructor(const FileGeneration*)
 {
@@ -28,15 +30,15 @@ void FileGeneration__destructor(const FileGeneration*)
  */
 static int FileGeneration_checkFileExisted(unsigned char* filePath)
 {
+    // Variables for obtaining the project path and file name location(index)
+    unsigned char projectPath[FILE_GENERATION_PROJECT_PATH_SIZE];
+    unsigned char* fileNameLoc = NULL;
+    FileGeneration_getProjectPath(projectPath);
 
     // Parsing the filePath, and generate the folder location and file name
     // Finding the last appearance of the character '/'
     char* loc = NULL;
     loc = strrchr((char*)filePath, '/');
-
-    unsigned char projectPath[FILE_GENERATION_PROJECT_PATH_SIZE];
-    unsigned char* fileNameLoc = NULL;
-    FileGeneration_getProjectPath(projectPath);
 
     // If strrchr finds nothing, then the address of fileNameLoc is equal to the one of filePath.
     if (loc == NULL) {
@@ -47,12 +49,16 @@ static int FileGeneration_checkFileExisted(unsigned char* filePath)
         projectPath[length++] = (unsigned char)'/';
 
         for (int i = 0; i < (((unsigned char*)loc) - filePath); i++) {
+            // (((unsigned char*)loc) - filePath) implies the address
             projectPath[length] = *(filePath + i);
             length++;
         }
         projectPath[length] = (unsigned char)'\0';
         fileNameLoc = (unsigned char*)(loc + 1);
     }
+    // Now, the projectPath will contain the folders' names of the filePath and
+    // the last two characters are (1) any character except '/' and (2) '\0'.
+    // e.g., the projectPath is "/C/home/user/myproject\0"
 
     int httpStatus = 500;
 #if defined(_WIN32) || defined(_WIN64)
@@ -73,7 +79,6 @@ static int FileGeneration_checkFileExisted(unsigned char* filePath)
             if (strcmp(individualFile, ".") == 0 || strcmp(individualFile, "..") == 0) {
                 continue;
             }
-
             // Assemble the file name
             unsigned char tempProjectPath[FILE_GENERATION_PROJECT_PATH_SIZE];
             memcpy(tempProjectPath, projectPath, (sizeof(unsigned char) * sizeof(projectPath)));
@@ -97,6 +102,10 @@ static int FileGeneration_checkFileExisted(unsigned char* filePath)
 #else
     // Linux
     DIR* dirCurrent = opendir((char*)projectPath);
+    if(dirCurrent == NULL) {
+        httpStatus = 500;
+        return httpStatus;
+    }
     const struct dirent* dirent = NULL;
     struct stat status;
 
@@ -135,8 +144,7 @@ static int FileGeneration_checkFileExisted(unsigned char* filePath)
 }
 
 /**
- * Obtaining the path of the project (i.e., generally,
- * the location depends on the location of the executable file)
+ * Obtaining the path of the project (i.e., the current working directory)
  *
  * @param projectPath The path of the project (calling by the value of the address)
  * @return int HTTP response status codes, more information can be referred
@@ -201,9 +209,22 @@ static int FileGeneration_writeFile(
     int contentsLen,
     unsigned char* mode)
 {
+    // Generating current working directory path
+    unsigned char projectPath[FILE_GENERATION_PROJECT_PATH_SIZE];
+    memset(projectPath, (unsigned char)'\0', FILE_GENERATION_PROJECT_PATH_SIZE);
+    FileGeneration_getProjectPath(projectPath);
+
+    // Generating complete file path
+    int length = 0;
+    length = (int)strlen((char*)projectPath);
+    projectPath[length++] = (unsigned char)'/';
+    projectPath[length++] = (unsigned char)'\0';
+    memcpy((projectPath + length - 1), filePath, (int)strlen((char*)filePath));
+
+    // Opening file by using fopen function
     int httpStatus = 200;
     FILE* pFilePtr = NULL;
-    pFilePtr = fopen((char*)filePath, (char*)mode);
+    pFilePtr = fopen((char*)projectPath, (char*)mode);
 
     if (pFilePtr == NULL) {
         httpStatus = 500;
@@ -234,9 +255,22 @@ static int FileGeneration_readFile(
     int startPos,
     int contentsLen)
 {
+    // Generating current working directory path
+    unsigned char projectPath[FILE_GENERATION_PROJECT_PATH_SIZE];
+    memset(projectPath, (unsigned char)'\0', FILE_GENERATION_PROJECT_PATH_SIZE);
+    FileGeneration_getProjectPath(projectPath);
+
+    // Generating complete file path
+    int length = 0;
+    length = (int)strlen((char*)projectPath);
+    projectPath[length++] = (unsigned char)'/';
+    projectPath[length++] = (unsigned char)'\0';
+    memcpy((projectPath + length - 1), filePath, (int)strlen((char*)filePath));
+
+    // Opening file by using fopen function
     int httpStatus = 200;
     FILE* pFilePtr = NULL;
-    pFilePtr = fopen((char*)filePath, (char*)mode);
+    pFilePtr = fopen((char*)projectPath, (char*)mode);
 
     if (pFilePtr == NULL) {
         httpStatus = 500;
@@ -247,6 +281,64 @@ static int FileGeneration_readFile(
             httpStatus = 200;
         } else {
             httpStatus = 500;
+        }
+    }
+
+    return httpStatus;
+}
+
+/**
+ * A process to maintain the directories from the path
+ *
+ * @param filePath unsigned char* The path of the file for directory maintenance
+ * @return int HTTP response status codes, more information can be referred
+ * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+ */
+static int FileGeneration_checkDirArchitecture(unsigned char* filePath) {
+    int httpStatus = 200;
+    // Variables for obtaining the project path and file name location(index)
+    unsigned char projectPath[FILE_GENERATION_PROJECT_PATH_SIZE];
+    FileGeneration_getProjectPath(projectPath);
+
+    // Parsing the filePath, and generate the folder location in the path string
+    char* loc = NULL;
+    char* prevLoc = NULL;
+    prevLoc = (char*)filePath;
+    loc = strchr((char*)filePath, '/');
+    int length = 0;
+    length = (int)strlen((char*)projectPath);
+    struct stat status;
+    unsigned char tempProjectPath[FILE_GENERATION_PROJECT_PATH_SIZE];
+
+    while (loc != NULL && httpStatus == 200) {
+        projectPath[length++] = (unsigned char)'/';
+        for (int i = 0; i < ((unsigned char*)loc - (unsigned char*)prevLoc); i++) {
+            // ((unsigned char*)loc - (unsigned char*)prevLoc) implies the address
+            projectPath[length++] = *(prevLoc + i);
+        }
+        projectPath[length] = '\0';
+        printf("The path is : %s\n", projectPath);
+        int tempLength = 0;
+        tempLength = length;
+        memcpy(tempProjectPath, projectPath, (sizeof(unsigned char) * sizeof(projectPath)));
+        tempProjectPath[tempLength++]= '/';
+        tempProjectPath[tempLength++]= '\0';
+
+        // Move the two pointers
+        prevLoc = loc + 1;
+        loc = strchr(prevLoc, '/');
+
+        // Upon successful completion, 0 is returned. Otherwise, -1.
+        printf("Ths stat %d\n", stat((char*)tempProjectPath, &status));
+        if (stat((char*)tempProjectPath, &status) != 0) {
+            httpStatus = FileGeneration_makeDir(projectPath);
+        } else {
+            // Determining the stuff of the path shall not belong to the folder type
+            int isDir = (status.st_mode & __S_IFDIR) != 0;
+            printf("Ths dir uis %d\n", isDir);
+            if(isDir == 0){
+                httpStatus = FileGeneration_makeDir(projectPath);
+            }
         }
     }
 

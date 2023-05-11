@@ -25,7 +25,7 @@ int ___encryption(
 
     EncodeDispatcher__constructor(&__encDisObject__);
 
-    int httpStatus = 0;
+    int httpStatus = 500;
     httpStatus = __encDisObject__.pf__encryption(
         plaintext,
         plaintextLen,
@@ -45,7 +45,7 @@ int ___encryption(
  * @param plaintext unsigned char* The plaintext
  * @param plaintextLen int* The length of the plaintext
  * @param tag unsigned char* The authentication tag
- * @param approach unsigned char* The approaches for decryption; nowadays,
+ * @param approach unsigned char* The approaches for decryption
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
@@ -58,7 +58,7 @@ int ___decryption(
     unsigned char* approach) {
 
     EncodeDispatcher__constructor(&__encDisObject__);
-    int httpStatus = 0;
+    int httpStatus = 500;
     httpStatus = __encDisObject__.pf__decryption(
         ciphertext,
         ciphertextLen,
@@ -67,5 +67,19 @@ int ___decryption(
         tag,
         approach
     );
+    return httpStatus;
+}
+
+/**
+ * Server key initialization
+ *
+ * @param approach unsigned char* The approaches for decryption
+ * @return int HTTP response status codes, more information can be referred
+ * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+ */
+int ___initializeServerKey(unsigned char* approach) {
+    EncodeDispatcher__constructor(&__encDisObject__);
+    int httpStatus = 500;
+    httpStatus = __encDisObject__.pf__initializeServerKey(approach);
     return httpStatus;
 }

@@ -20,7 +20,7 @@
 #define AES_256_GCM_KEY_SIZE 32 // 256 bits
 #define AES_256_GCM_IV_SIZE 12 // 96 bits
 #define AES_256_GCM_TAG_SIZE 16 // 128 bits
-#define AES_256_GCM_KEY_LOCATION ".privacy/.encryptionAES256GCM.bin" // {project}/.privacy/.encryptionAES256GCM.bin
+#define AES_256_GCM_KEY_LOCATION ".privacy/.encryptionAES256GCM.bin" // {current working directory path}/.privacy/.encryptionAES256GCM.bin
 
 // Class definition
 typedef struct AES_256_GCM AES_256_GCM;

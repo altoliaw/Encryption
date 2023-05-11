@@ -8,7 +8,7 @@ static int AES_256_GCM_getMasterKey(AES_256_GCM*);
 static int AES_256_GCM_getIV(unsigned char*);
 static int AES_256_GCM_checkFileExisted();
 static int AES_256_GCM_readKeyFile(AES_256_GCM*);
-
+static int AES_256_GCM_checkDirArchitecture();
 
 void AES_256_GCM__constructor(AES_256_GCM* a2gObject)
 {
@@ -52,12 +52,17 @@ static int AES_256_GCM_encryption(
     int* ciphertextLen,
     unsigned char* authTag)
 {
+    int httpStatus = 500;
+    httpStatus = AES_256_GCM_checkFileExisted();
+    if (httpStatus != 200) {
+        printf("Key Lost.\n");
+        return 500;
+    }
 
     AES_256_GCM const* pA2gObject = (AES_256_GCM*)pEnc;
     unsigned char const* key = pA2gObject->masterKey;
     unsigned char iv[(AES_256_GCM_IV_SIZE + 1)]; // "+1" is for the symbol '\0'.
     memset(iv, (unsigned char)'\0', AES_256_GCM_IV_SIZE + 1);
-    int httpStatus = 500;
     httpStatus = AES_256_GCM_getIV(iv);
 
     if(httpStatus == 200) {
@@ -157,9 +162,15 @@ static int AES_256_GCM_decryption(
     unsigned char* authTag)
 {
 
+    int httpStatus = 500;
+    httpStatus = AES_256_GCM_checkFileExisted();
+    if (httpStatus != 200) {
+        printf("Key Lost.\n");
+        return 500;
+    }
+
     AES_256_GCM const* pA2gObject = (AES_256_GCM*)pEnc;
     unsigned char const* key = pA2gObject->masterKey;
-
     // Obtaining the IV value
     unsigned char iv[AES_256_GCM_IV_SIZE + 1];
     memset(iv, (unsigned char)'\0', AES_256_GCM_IV_SIZE + 1);
@@ -274,10 +285,11 @@ static int AES_256_GCM_getMasterKey(AES_256_GCM* a2gObject)
     int httpStatus = 500;
     int tmpKeyLength =0;
     tmpKeyLength = (int)strlen((char*)a2gObject->masterKey);
-    if(tmpKeyLength <= 0) {
+
+    if(tmpKeyLength <= 0 && AES_256_GCM_checkFileExisted() == 200) {
         AES_256_GCM_readKeyFile(a2gObject);
+        httpStatus = 200;
     }
-    httpStatus = 200;
     return httpStatus;
 }
 
@@ -350,11 +362,30 @@ static int AES_256_GCM_initializeMasterKey(Encode* pEnc)
     AES_256_GCM* a2gObject = NULL;
     a2gObject = (AES_256_GCM*)pEnc;
     int httpStatus = 500 ;
+
+    if (AES_256_GCM_checkDirArchitecture() != 200) {
+        return httpStatus;
+    }
+
     httpStatus = AES_256_GCM_checkFileExisted();
 
     if(httpStatus == 500) {
         httpStatus = AES_256_GCM_generateMasterKey(a2gObject);
     }
 
+    return httpStatus;
+}
+
+/**
+ * A process to maintain the directories from the path
+ *
+ * @return int HTTP response status codes, more information can be referred
+ * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+ */
+static int AES_256_GCM_checkDirArchitecture() {
+    int httpStatus = 500;
+    FileGeneration fileGeneration;
+    FileGeneration__constructor(&fileGeneration);
+    httpStatus = fileGeneration.pf__checkDirArchitecture((unsigned char*)AES_256_GCM_KEY_LOCATION);
     return httpStatus;
 }

@@ -20,11 +20,11 @@
 #else
 #include <unistd.h> // For obtaining the location in the system
 #include <dirent.h> // Iteration from a folder on linux platform
+#endif
 #include <sys/stat.h> // "mkdir" on linux platform
 #include <sys/types.h> // Iteration from a folder on linux platform
-#endif
 
-#define FILE_GENERATION_PROJECT_PATH_SIZE 256 // 256 bits
+#define FILE_GENERATION_PROJECT_PATH_SIZE 256 // 256 bytes
 
 // Class declarations
 typedef struct FileGeneration FileGeneration;
@@ -36,6 +36,7 @@ struct FileGeneration {
   int (*pf__makeDir)(unsigned char*);
   int (*pf__writeFile)(unsigned char*, unsigned char const*, int, unsigned char*);
   int (*pf__readFile)(unsigned char*, unsigned char*, unsigned char*, int, int);
+  int (*pf__checkDirArchitecture)(unsigned char*);
 };
 
 // Method declarations
