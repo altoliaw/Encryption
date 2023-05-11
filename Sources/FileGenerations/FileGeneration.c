@@ -334,7 +334,11 @@ static int FileGeneration_checkDirArchitecture(unsigned char* filePath) {
             httpStatus = FileGeneration_makeDir(projectPath);
         } else {
             // Determining the stuff of the path shall not belong to the folder type
+        #if defined(_WIN32) || defined(_WIN64)
+            int isDir = (status.st_mode & S_IFDIR) != 0;
+        #else
             int isDir = (status.st_mode & __S_IFDIR) != 0;
+        #endif
             printf("Ths dir uis %d\n", isDir);
             if(isDir == 0){
                 httpStatus = FileGeneration_makeDir(projectPath);
