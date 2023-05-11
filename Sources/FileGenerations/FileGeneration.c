@@ -92,8 +92,10 @@ static int FileGeneration_checkFileExisted(unsigned char* filePath)
             if (dir == 1) {
                 continue;
             } else {
-                httpStatus = 200;
-                break;
+                if (strcmp(individualFile, (char*)fileNameLoc) == 0) {
+                    httpStatus = 200;
+                    break;
+                }
             }
 
         } while (FindNextFile(handler, &data) != 0);
@@ -317,7 +319,6 @@ static int FileGeneration_checkDirArchitecture(unsigned char* filePath) {
             projectPath[length++] = *(prevLoc + i);
         }
         projectPath[length] = '\0';
-        printf("The path is : %s\n", projectPath);
         int tempLength = 0;
         tempLength = length;
         memcpy(tempProjectPath, projectPath, (sizeof(unsigned char) * sizeof(projectPath)));
@@ -329,7 +330,6 @@ static int FileGeneration_checkDirArchitecture(unsigned char* filePath) {
         loc = strchr(prevLoc, '/');
 
         // Upon successful completion, 0 is returned. Otherwise, -1.
-        printf("Ths stat %d\n", stat((char*)tempProjectPath, &status));
         if (stat((char*)tempProjectPath, &status) != 0) {
             httpStatus = FileGeneration_makeDir(projectPath);
         } else {
@@ -339,7 +339,6 @@ static int FileGeneration_checkDirArchitecture(unsigned char* filePath) {
         #else
             int isDir = (status.st_mode & __S_IFDIR) != 0;
         #endif
-            printf("Ths dir uis %d\n", isDir);
             if(isDir == 0){
                 httpStatus = FileGeneration_makeDir(projectPath);
             }

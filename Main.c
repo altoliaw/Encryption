@@ -7,7 +7,7 @@
 int main(int argc, char *argv[]) {
     int iHttpNum = 0;
     iHttpNum = ___initializeServerKey((unsigned char*)"AES_256_GCM");
-    printf("ihhtp is %d\n", iHttpNum);
+    printf("http is %d\n", iHttpNum);
     /*
     int iLen = 0;
     unsigned char buffer[2060];
