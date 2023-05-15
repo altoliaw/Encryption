@@ -222,6 +222,7 @@ static int FileGeneration_writeFile(
     projectPath[length++] = (unsigned char)'/';
     projectPath[length++] = (unsigned char)'\0';
     memcpy((projectPath + length - 1), filePath, (int)strlen((char*)filePath));
+    projectPath[(length - 1 + (int)strlen((char*)filePath))] = '\0';
 
     // Opening file by using fopen function
     int httpStatus = 200;
@@ -268,6 +269,7 @@ static int FileGeneration_readFile(
     projectPath[length++] = (unsigned char)'/';
     projectPath[length++] = (unsigned char)'\0';
     memcpy((projectPath + length - 1), filePath, (int)strlen((char*)filePath));
+    projectPath[(length - 1 + (int)strlen((char*)filePath))] = '\0';
 
     // Opening file by using fopen function
     int httpStatus = 200;
