@@ -20,6 +20,7 @@ struct Encode {
   int (*pf__encryption)(Encode*, const unsigned char*, const int, unsigned char*, int*, unsigned char*);
   int (*pf__decryption)(Encode*, unsigned char*, int, unsigned char*, int*, unsigned char*);
   int (*pf__initializeServerKey)(Encode*);
+  int (*pf__setProjectPath)(Encode*, unsigned char*);
 };
 
 // Method declarations

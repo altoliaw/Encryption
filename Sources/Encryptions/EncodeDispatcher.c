@@ -3,9 +3,11 @@
 static int EncodeDispatcher_encryption(const unsigned char*, const int, unsigned char*, int*, unsigned char*, unsigned char*);
 static int EncodeDispatcher_decryption(unsigned char*, int, unsigned char*, int*, unsigned char*, unsigned char*);
 static int EncodeDispatcher_initializeServerKey(unsigned char*);
+static int EncodeDispatcher_setProjectPath(unsigned char*, unsigned char*);
 static int (*EncodeDispatcher_encryptedDispatcher(unsigned char*, Encode*))(Encode*, const unsigned char*, const int, unsigned char*, int*, unsigned char*);
 static int (*EncodeDispatcher_decryptedDispatcher(unsigned char*, Encode*))(Encode*, unsigned char*, int, unsigned char*, int*, unsigned char*);
 static int (*EncodeDispatcher_initializeServerKeyDispatcher(unsigned char*, Encode*))(Encode*);
+static int (*EncodeDispatcher_setProjectPathDispatcher(unsigned char* approach, Encode* pEnc))(Encode* pEnc, unsigned char* projectPath);
 static Encode* EncodeDispatcher_createEncryptedObject(unsigned char*);
 
 void EncodeDispatcher__constructor(EncodeDispatcher* encObject)
@@ -13,6 +15,7 @@ void EncodeDispatcher__constructor(EncodeDispatcher* encObject)
     encObject->pf__encryption = &EncodeDispatcher_encryption;
     encObject->pf__decryption = &EncodeDispatcher_decryption;
     encObject->pf__initializeServerKey = &EncodeDispatcher_initializeServerKey;
+    encObject->pf__setProjectPath = &EncodeDispatcher_setProjectPath;
 }
 
 void EncodeDispatcher__destructor(const EncodeDispatcher*)
@@ -87,7 +90,7 @@ static int EncodeDispatcher_decryption(
 /**
  * Key generation initialization
  *
- * @param approach unsigned char* The approaches for decryption; nowadays,
+ * @param approach unsigned char* The approaches for decryption; nowadays, "AES_256_GCM" is acceptable.
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
@@ -103,6 +106,28 @@ static int EncodeDispatcher_initializeServerKey(unsigned char* approach)
 
     return httpStatus;
 }
+
+/**
+ * Project path initialization
+ *
+ * @param approach unsigned char* The approaches for decryption; nowadays, "AES_256_GCM" is acceptable.
+ * @param projectPath unsigned char* The project path
+ * @return int HTTP response status codes, more information can be referred
+ * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+ */
+static int EncodeDispatcher_setProjectPath(unsigned char* approach, unsigned char* projectPath)
+{
+    Encode* pEnc = NULL;
+    pEnc = EncodeDispatcher_createEncryptedObject(approach);
+
+    // Definition of function variable & execution of the function
+    int (*dispatcher)(Encode*, unsigned char*);
+    dispatcher = EncodeDispatcher_setProjectPathDispatcher(approach, pEnc);
+    int httpStatus = dispatcher(pEnc, projectPath);
+
+    return httpStatus;
+}
+
 
 /**
  * Encryption Dispatcher
@@ -170,7 +195,7 @@ static int (*EncodeDispatcher_decryptedDispatcher(unsigned char* approach, Encod
 /**
  * Key generation initialization dispatcher
  *
- * @param approach unsigned char* The approaches for decryption
+ * @param approach unsigned char* The approaches for initializing the server key
  * @param pEnv Encode* The address of the decryption object
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
@@ -182,7 +207,30 @@ static int (*EncodeDispatcher_initializeServerKeyDispatcher(unsigned char* appro
     if (!strcmp((char*)approach, "AES_256_GCM")) {
         AES_256_GCM* pa2gObject = NULL;
         pa2gObject = (AES_256_GCM*)pEnc;
-        return (pa2gObject->o_Encode).pf__initializeServerKey; // Pass the execution of AES encryption
+        return (pa2gObject->o_Encode).pf__initializeServerKey; // Pass the execution of AES server key initialization
+    } else {
+        return NULL;
+    }
+    return 0;
+}
+
+/**
+ * Key generation initialization dispatcher
+ *
+ * @param approach unsigned char* The approaches for setting the project path
+ * @param pEnv Encode* The address of the decryption object
+ * @param projectPath unsigned char* The project path
+ * @return int HTTP response status codes, more information can be referred
+ * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+ */
+static int (*EncodeDispatcher_setProjectPathDispatcher(unsigned char* approach, Encode* pEnc))(
+    Encode* pEnc, unsigned char* projectPath)
+{
+
+    if (!strcmp((char*)approach, "AES_256_GCM")) {
+        AES_256_GCM* pa2gObject = NULL;
+        pa2gObject = (AES_256_GCM*)pEnc;
+        return (pa2gObject->o_Encode).pf__setProjectPath; // Pass the execution of AES server key initialization
     } else {
         return NULL;
     }
@@ -192,7 +240,7 @@ static int (*EncodeDispatcher_initializeServerKeyDispatcher(unsigned char* appro
 /**
  * Creating child object and converting a child object pointer to a parent pointer
  *
- * @param approach unsigned char* The approach for encryption
+ * @param approach unsigned char* The approach for encryption, "AES_256_GCM" is acceptable.
  * @return Encode* The address of the parent object shall be passed
  */
 static Encode* EncodeDispatcher_createEncryptedObject(unsigned char* approach)

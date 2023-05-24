@@ -1,21 +1,26 @@
 #include "../../Headers/FileGenerations/FileGeneration.h"
 
-static int FileGeneration_checkFileExisted(unsigned char*);
-static int FileGeneration_getProjectPath(unsigned char*);
+static int FileGeneration_checkFileExisted(FileGeneration*, unsigned char*);
+static int FileGeneration_setProjectPath(FileGeneration*, unsigned char*);
+static int FileGeneration_getProjectPath(FileGeneration*, unsigned char*);
 static int FileGeneration_makeDir(unsigned char*);
-static int FileGeneration_writeFile(unsigned char*, unsigned char const*, int, unsigned char*);
-static int FileGeneration_readFile(unsigned char*, unsigned char*, unsigned char*, int, int);
-static int FileGeneration_checkDirArchitecture(unsigned char*);
+static int FileGeneration_writeFile(FileGeneration*, unsigned char*, unsigned char const*, int, unsigned char*);
+static int FileGeneration_readFile(FileGeneration*, unsigned char*, unsigned char*, unsigned char*, int, int);
+static int FileGeneration_checkDirArchitecture(FileGeneration*, unsigned char*);
 
 // Method definitions
 void FileGeneration__constructor(FileGeneration* oFG)
 {
     oFG->pf__checkFileExisted = &FileGeneration_checkFileExisted;
+    oFG->pf__setProjectPath = &FileGeneration_setProjectPath;
     oFG->pf__getProjectPath = &FileGeneration_getProjectPath;
     oFG->pf__makeDir = &FileGeneration_makeDir;
     oFG->pf__writeFile = &FileGeneration_writeFile;
     oFG->pf__readFile = &FileGeneration_readFile;
     oFG->pf__checkDirArchitecture = &FileGeneration_checkDirArchitecture;
+
+    memset(oFG->currentWorkingDirectory, (unsigned char)'\0', FILE_GENERATION_PROJECT_PATH_SIZE);
+    oFG->defaultCurrentWorkingDirectory = DEFAULT_CURRENT_WORKING_DIRECTORY;
 }
 void FileGeneration__destructor(const FileGeneration*)
 {
@@ -24,21 +29,24 @@ void FileGeneration__destructor(const FileGeneration*)
 
 /**
  * Checking the file existence. If the file exists
+ *
+ * @param oFG FileGeneration* The address of the instance of the class
  * @param filePath unsigned char* The path of the file
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
-static int FileGeneration_checkFileExisted(unsigned char* filePath)
+static int FileGeneration_checkFileExisted(FileGeneration* oFG,  unsigned char* filePath)
 {
     // Variables for obtaining the project path and file name location(index)
     unsigned char projectPath[FILE_GENERATION_PROJECT_PATH_SIZE];
     unsigned char* fileNameLoc = NULL;
-    FileGeneration_getProjectPath(projectPath);
+    FileGeneration_getProjectPath(oFG, projectPath);
 
     // Parsing the filePath, and generate the folder location and file name
     // Finding the last appearance of the character '/'
     char* loc = NULL;
     loc = strrchr((char*)filePath, '/');
+    int httpStatus = 200;
 
     // If strrchr finds nothing, then the address of fileNameLoc is equal to the one of filePath.
     if (loc == NULL) {
@@ -46,7 +54,12 @@ static int FileGeneration_checkFileExisted(unsigned char* filePath)
     } else { // Concatenate substring of filePath to projectPath
         int length = 0;
         length = (int)strlen((char*)projectPath);
-        projectPath[length++] = (unsigned char)'/';
+        if(length < FILE_GENERATION_PROJECT_PATH_SIZE) {
+            projectPath[length++] = (unsigned char)'/';
+        } else {
+            httpStatus = 500;
+            return httpStatus;
+        }
 
         for (int i = 0; i < (((unsigned char*)loc) - filePath); i++) {
             // (((unsigned char*)loc) - filePath) implies the address
@@ -60,7 +73,7 @@ static int FileGeneration_checkFileExisted(unsigned char* filePath)
     // the last two characters are (1) any character except '/' and (2) '\0'.
     // e.g., the projectPath is "/C/home/user/myproject\0"
 
-    int httpStatus = 500;
+    httpStatus = 500;
 #if defined(_WIN32) || defined(_WIN64)
     // Windows
     int length = 0;
@@ -104,7 +117,7 @@ static int FileGeneration_checkFileExisted(unsigned char* filePath)
 #else
     // Linux
     DIR* dirCurrent = opendir((char*)projectPath);
-    if(dirCurrent == NULL) {
+    if (dirCurrent == NULL) {
         httpStatus = 500;
         return httpStatus;
     }
@@ -146,30 +159,75 @@ static int FileGeneration_checkFileExisted(unsigned char* filePath)
 }
 
 /**
- * Obtaining the path of the project (i.e., the current working directory)
+ * Setting the path of the project (i.e., the current working directory) by copying from the parameter;
+ * if the `DEFAULT_CURRENT_WORKING_DIRECTORY` variable is equal to zero, the function will do nothing
  *
- * @param projectPath The path of the project (calling by the value of the address)
+ * @param oFG FileGeneration* The address of the instance of the class
+ * @param projectPath The path of the project (calling by the value of the address);
+ * in Linux, the content of path is like `/home/nick/Workspace/C/Encryption;
+ * as for Windows, the one is `C:/nick/Workspace/C/Encryption`
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
-static int FileGeneration_getProjectPath(unsigned char* projectPath)
+static int FileGeneration_setProjectPath(FileGeneration* oFG, unsigned char* projectPath)
+{
+    int httpStatus = 200;
+    if(oFG->defaultCurrentWorkingDirectory != 0) {
+        int length = (int)strlen((char*)projectPath);
+        memcpy(oFG->currentWorkingDirectory, projectPath, length);
+        oFG->currentWorkingDirectory[length] = (unsigned char)'\0';
+    }
+    return httpStatus;
+}
+
+/**
+ * Obtaining the path of the project (i.e., the current working directory)
+ *
+ * @param oFG FileGeneration* The address of the instance of the class
+ * @param projectPath The returned path of the project (calling by the value of the address);
+ * in Linux, the content of path is like `/home/nick/Workspace/C/Encryption;
+ * as for Windows, the one is `C:/nick/Workspace/C/Encryption`
+ * @return int HTTP response status codes, more information can be referred
+ * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+ */
+static int FileGeneration_getProjectPath(FileGeneration* oFG, unsigned char* projectPath)
 {
     int httpStatus = 200;
     char buffer[FILE_GENERATION_PROJECT_PATH_SIZE];
-#if defined(_WIN32) || defined(_WIN64)
-    // Windows
-    if ((int)GetCurrentDirectory(sizeof(char) * sizeof(buffer), buffer) == 0) {
-        httpStatus = 500;
-    }
-#else
-    // Linux
-    if (getcwd(buffer, sizeof(char) * sizeof(buffer)) == NULL) {
-        httpStatus = 500;
-    }
-#endif
+    if (oFG->defaultCurrentWorkingDirectory != 0 && strlen((char*)oFG->currentWorkingDirectory) != 0) {
+        int length = 0;
+        length = (int)strlen((char*)oFG->currentWorkingDirectory);
+        memcpy(projectPath, oFG->currentWorkingDirectory, length);
+        projectPath[length] = (unsigned char)'\0';
+    } else {
+    #if defined(_WIN32) || defined(_WIN64)
+        // Windows
+        if ((int)GetCurrentDirectory(sizeof(char) * sizeof(buffer), buffer) == 0) {
+            httpStatus = 500;
+        }
+    #else
+        // Linux
+        if (getcwd(buffer, sizeof(char) * sizeof(buffer)) == NULL) {
+            httpStatus = 500;
+        }
+    #endif
 
-    if (httpStatus == 200) {
-        memcpy(projectPath, buffer, (sizeof(buffer) * sizeof(char)));
+        if (httpStatus == 200) {
+            // If the `DEFAULT_CURRENT_WORKING_DIRECTORY` variable is not equal to zero (i.e.,
+            // the value represents that the current working directory shall be set by users), the current working directory
+            // will be returned with the default path but the returned value will be 500.
+            if(oFG->defaultCurrentWorkingDirectory != 0 && strlen((char*)oFG->currentWorkingDirectory) == 0){
+                httpStatus = 500;
+            }
+            memcpy(projectPath, buffer, (sizeof(buffer) * sizeof(char)));
+            int length =  (int) strlen((char*)projectPath);
+            memcpy(oFG->currentWorkingDirectory, projectPath, length);
+            if(length < FILE_GENERATION_PROJECT_PATH_SIZE) {
+                oFG->currentWorkingDirectory[length] = (unsigned char)'\0';
+            } else {
+                oFG->currentWorkingDirectory[FILE_GENERATION_PROJECT_PATH_SIZE -1] = (unsigned char)'\0';
+            }
+        }
     }
     return httpStatus;
 }
@@ -199,6 +257,7 @@ static int FileGeneration_makeDir(unsigned char* dirPath)
 /**
  * Writing the contents into the specified directory.
  *
+ * @param oFG FileGeneration* The address of the instance of the class
  * @param filePath unsigned char* The path of the file for writing
  * @param contents unsigned char* The contents
  * @param mode unsigned char* The fwrite mode in C
@@ -206,6 +265,7 @@ static int FileGeneration_makeDir(unsigned char* dirPath)
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
 static int FileGeneration_writeFile(
+    FileGeneration* oFG,
     unsigned char* filePath,
     unsigned char const* contents,
     int contentsLen,
@@ -214,18 +274,29 @@ static int FileGeneration_writeFile(
     // Generating current working directory path
     unsigned char projectPath[FILE_GENERATION_PROJECT_PATH_SIZE];
     memset(projectPath, (unsigned char)'\0', FILE_GENERATION_PROJECT_PATH_SIZE);
-    FileGeneration_getProjectPath(projectPath);
+    FileGeneration_getProjectPath(oFG, projectPath);
+
+    int httpStatus = 200;
 
     // Generating complete file path
     int length = 0;
     length = (int)strlen((char*)projectPath);
-    projectPath[length++] = (unsigned char)'/';
-    projectPath[length++] = (unsigned char)'\0';
+    if(length < FILE_GENERATION_PROJECT_PATH_SIZE) {
+        projectPath[length++] = (unsigned char)'/';
+    } else {
+        httpStatus = 500;
+        return httpStatus;
+    }
+    if(length < FILE_GENERATION_PROJECT_PATH_SIZE) {
+        projectPath[length++] = (unsigned char)'\0';
+    } else {
+        httpStatus = 500;
+        return httpStatus;
+    }
     memcpy((projectPath + length - 1), filePath, (int)strlen((char*)filePath));
     projectPath[(length - 1 + (int)strlen((char*)filePath))] = '\0';
 
     // Opening file by using fopen function
-    int httpStatus = 200;
     FILE* pFilePtr = NULL;
     pFilePtr = fopen((char*)projectPath, (char*)mode);
 
@@ -242,6 +313,7 @@ static int FileGeneration_writeFile(
 /**
  * Reading the contents into the specified directory.
  *
+ * @param oFG FileGeneration* The address of the instance of the class
  * @param filePath unsigned char* The path of the file for writing
  * @param buffer unsigned char* The contents in the file by using call-by the value of address,
  * the buffer size shall be defined in the calling function.
@@ -252,6 +324,7 @@ static int FileGeneration_writeFile(
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
 static int FileGeneration_readFile(
+    FileGeneration* oFG,
     unsigned char* filePath,
     unsigned char* buffer,
     unsigned char* mode,
@@ -261,18 +334,29 @@ static int FileGeneration_readFile(
     // Generating current working directory path
     unsigned char projectPath[FILE_GENERATION_PROJECT_PATH_SIZE];
     memset(projectPath, (unsigned char)'\0', FILE_GENERATION_PROJECT_PATH_SIZE);
-    FileGeneration_getProjectPath(projectPath);
+    FileGeneration_getProjectPath(oFG, projectPath);
 
+    int httpStatus = 200;
     // Generating complete file path
     int length = 0;
     length = (int)strlen((char*)projectPath);
-    projectPath[length++] = (unsigned char)'/';
-    projectPath[length++] = (unsigned char)'\0';
+    if(length < FILE_GENERATION_PROJECT_PATH_SIZE) {
+        projectPath[length++] = (unsigned char)'/';
+    } else {
+        httpStatus = 500;
+        return httpStatus;
+    }
+    if(length < FILE_GENERATION_PROJECT_PATH_SIZE) {
+        projectPath[length++] = (unsigned char)'\0';
+    } else {
+        httpStatus = 500;
+        return httpStatus;
+    }
+
     memcpy((projectPath + length - 1), filePath, (int)strlen((char*)filePath));
     projectPath[(length - 1 + (int)strlen((char*)filePath))] = '\0';
 
     // Opening file by using fopen function
-    int httpStatus = 200;
     FILE* pFilePtr = NULL;
     pFilePtr = fopen((char*)projectPath, (char*)mode);
 
@@ -294,15 +378,17 @@ static int FileGeneration_readFile(
 /**
  * A process to maintain the directories from the path
  *
+ * @param oFG FileGeneration* The address of the instance of the class
  * @param filePath unsigned char* The path of the file for directory maintenance
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
-static int FileGeneration_checkDirArchitecture(unsigned char* filePath) {
+static int FileGeneration_checkDirArchitecture(FileGeneration* oFG, unsigned char* filePath)
+{
     int httpStatus = 200;
     // Variables for obtaining the project path and file name location(index)
     unsigned char projectPath[FILE_GENERATION_PROJECT_PATH_SIZE];
-    FileGeneration_getProjectPath(projectPath);
+    FileGeneration_getProjectPath(oFG, projectPath);
 
     // Parsing the filePath, and generate the folder location in the path string
     char* loc = NULL;
@@ -315,17 +401,23 @@ static int FileGeneration_checkDirArchitecture(unsigned char* filePath) {
     unsigned char tempProjectPath[FILE_GENERATION_PROJECT_PATH_SIZE];
 
     while (loc != NULL && httpStatus == 200) {
-        projectPath[length++] = (unsigned char)'/';
+        if(length < FILE_GENERATION_PROJECT_PATH_SIZE) {
+            projectPath[length++] = (unsigned char)'/';
+        } else {
+           httpStatus = 500;
+           break;
+        }
+
         for (int i = 0; i < ((unsigned char*)loc - (unsigned char*)prevLoc); i++) {
             // ((unsigned char*)loc - (unsigned char*)prevLoc) implies the address
-            projectPath[length++] = *(prevLoc + i);
+            projectPath[length++] = (unsigned char)(*(prevLoc + i));
         }
-        projectPath[length] = '\0';
+        projectPath[length] = (unsigned char)'\0';
         int tempLength = 0;
         tempLength = length;
         memcpy(tempProjectPath, projectPath, (sizeof(unsigned char) * sizeof(projectPath)));
-        tempProjectPath[tempLength++]= '/';
-        tempProjectPath[tempLength++]= '\0';
+        tempProjectPath[tempLength++] = (unsigned char)'/';
+        tempProjectPath[tempLength++] = (unsigned char)'\0';
 
         // Move the two pointers
         prevLoc = loc + 1;
@@ -347,5 +439,20 @@ static int FileGeneration_checkDirArchitecture(unsigned char* filePath) {
         }
     }
 
+    return httpStatus;
+}
+
+/**
+ * A process to maintain the directories from the path
+ *
+ * @param oFG FileGeneration* The address of the instance of the class
+ * @param value
+ * @return int HTTP response status codes, more information can be referred
+ * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+ */
+static int FileGeneration_setDefaultCurrentWorkingDirectoryValue(FileGeneration* oFG, unsigned int workingValue)
+{
+    int httpStatus =200;
+    oFG->defaultCurrentWorkingDirectory = (workingValue > 0) ? 1 : 0;
     return httpStatus;
 }

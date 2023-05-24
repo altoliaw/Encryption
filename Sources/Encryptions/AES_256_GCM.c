@@ -3,12 +3,13 @@
 static int AES_256_GCM_encryption(Encode*, const unsigned char*, const int, unsigned char*, int*, unsigned char*);
 static int AES_256_GCM_decryption(Encode*, unsigned char*, int, unsigned char*, int*, unsigned char*);
 static int AES_256_GCM_initializeMasterKey(Encode*);
+static int AES_256_GCM_setProjectPath(Encode*, unsigned char*);
 static int AES_256_GCM_generateMasterKey(AES_256_GCM*);
 static int AES_256_GCM_getMasterKey(AES_256_GCM*);
 static int AES_256_GCM_getIV(unsigned char*);
-static int AES_256_GCM_checkFileExisted();
+static int AES_256_GCM_checkFileExisted(AES_256_GCM*);
 static int AES_256_GCM_readKeyFile(AES_256_GCM*);
-static int AES_256_GCM_checkDirArchitecture();
+static int AES_256_GCM_checkDirArchitecture(AES_256_GCM*);
 
 void AES_256_GCM__constructor(AES_256_GCM* a2gObject)
 {
@@ -18,16 +19,20 @@ void AES_256_GCM__constructor(AES_256_GCM* a2gObject)
     (a2gObject->o_Encode).pf__encryption = &AES_256_GCM_encryption;
     (a2gObject->o_Encode).pf__decryption = &AES_256_GCM_decryption;
     (a2gObject->o_Encode).pf__initializeServerKey = &AES_256_GCM_initializeMasterKey;
+    (a2gObject->o_Encode).pf__setProjectPath = &AES_256_GCM_setProjectPath;
     memset(a2gObject->masterKey, (unsigned char)'\0', AES_256_GCM_KEY_SIZE);
 
     // Class methods
     a2gObject->pf__checkFileExisted = &AES_256_GCM_checkFileExisted;
     AES_256_GCM_getMasterKey(a2gObject);
+
+    // FileGeneration constructor
+    FileGeneration__constructor(&(a2gObject->fileGeneration));
 }
 
-void AES_256_GCM__destructor(const AES_256_GCM*)
+void AES_256_GCM__destructor(AES_256_GCM* a2gObject)
 {
-    // Destructor function
+    FileGeneration__destructor(&(a2gObject->fileGeneration));
 }
 
 /**
@@ -53,19 +58,20 @@ static int AES_256_GCM_encryption(
     unsigned char* authTag)
 {
     int httpStatus = 500;
-    httpStatus = AES_256_GCM_checkFileExisted();
+    AES_256_GCM* pA2gObject = (AES_256_GCM*)pEnc;
+    unsigned char const* key = pA2gObject->masterKey;
+
+    httpStatus = AES_256_GCM_checkFileExisted(pA2gObject);
     if (httpStatus != 200) {
         printf("Key Lost.\n");
         return 500;
     }
 
-    AES_256_GCM const* pA2gObject = (AES_256_GCM*)pEnc;
-    unsigned char const* key = pA2gObject->masterKey;
     unsigned char iv[(AES_256_GCM_IV_SIZE + 1)]; // "+1" is for the symbol '\0'.
     memset(iv, (unsigned char)'\0', AES_256_GCM_IV_SIZE + 1);
     httpStatus = AES_256_GCM_getIV(iv);
 
-    if(httpStatus == 200) {
+    if (httpStatus == 200) {
 
         int currentLen = 0;
         int cipherLen = 0;
@@ -162,15 +168,16 @@ static int AES_256_GCM_decryption(
     unsigned char* authTag)
 {
 
+    AES_256_GCM* pA2gObject = (AES_256_GCM*)pEnc;
+    unsigned char const* key = pA2gObject->masterKey;
+
     int httpStatus = 500;
-    httpStatus = AES_256_GCM_checkFileExisted();
+    httpStatus = AES_256_GCM_checkFileExisted(pA2gObject);
     if (httpStatus != 200) {
         printf("Key Lost.\n");
         return 500;
     }
 
-    AES_256_GCM const* pA2gObject = (AES_256_GCM*)pEnc;
-    unsigned char const* key = pA2gObject->masterKey;
     // Obtaining the IV value
     unsigned char iv[AES_256_GCM_IV_SIZE + 1];
     memset(iv, (unsigned char)'\0', AES_256_GCM_IV_SIZE + 1);
@@ -261,13 +268,7 @@ static int AES_256_GCM_generateMasterKey(AES_256_GCM* a2gObject)
     httpStatus = RAND_bytes(a2gObject->masterKey, AES_256_GCM_KEY_SIZE);
     httpStatus = (httpStatus == 1) ? 200 : 500;
     if (httpStatus == 200) {
-        FileGeneration fileGeneration;
-        FileGeneration__constructor(&fileGeneration);
-        httpStatus = fileGeneration.pf__writeFile(
-            (unsigned char*)AES_256_GCM_KEY_LOCATION,
-            a2gObject->masterKey,
-            (int)sizeof(a2gObject->masterKey),
-            (unsigned char*)"wb");
+        httpStatus = (a2gObject->fileGeneration).pf__writeFile(&(a2gObject->fileGeneration), (unsigned char*)AES_256_GCM_KEY_LOCATION, a2gObject->masterKey, (int)sizeof(a2gObject->masterKey), (unsigned char*)"wb");
     }
 
     return httpStatus;
@@ -283,10 +284,10 @@ static int AES_256_GCM_generateMasterKey(AES_256_GCM* a2gObject)
 static int AES_256_GCM_getMasterKey(AES_256_GCM* a2gObject)
 {
     int httpStatus = 500;
-    int tmpKeyLength =0;
+    int tmpKeyLength = 0;
     tmpKeyLength = (int)strlen((char*)a2gObject->masterKey);
 
-    if(tmpKeyLength <= 0 && AES_256_GCM_checkFileExisted() == 200) {
+    if (tmpKeyLength <= 0 && AES_256_GCM_checkFileExisted(a2gObject) == 200) {
         AES_256_GCM_readKeyFile(a2gObject);
         httpStatus = 200;
     }
@@ -312,15 +313,15 @@ static int AES_256_GCM_getIV(unsigned char* pivValue)
 /**
  * Checking if the master key file exists
  *
+ * @param a2gObject AES_256_GCM* The address of the AES_256_GCM instance
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
-static int AES_256_GCM_checkFileExisted()
+static int AES_256_GCM_checkFileExisted(AES_256_GCM* a2gObject)
 {
     int httpStatus = 500; // false flag
-    FileGeneration fileGeneration;
-    FileGeneration__constructor(&fileGeneration);
-    httpStatus = fileGeneration.pf__checkFileExisted((unsigned char*)AES_256_GCM_KEY_LOCATION);
+
+    httpStatus = (a2gObject->fileGeneration).pf__checkFileExisted(&(a2gObject->fileGeneration), (unsigned char*)AES_256_GCM_KEY_LOCATION);
 
     return httpStatus;
 }
@@ -328,21 +329,15 @@ static int AES_256_GCM_checkFileExisted()
 /**
  * Reading the key file
  *
+ * @param a2gObject AES_256_GCM* The address of the AES_256_GCM instance
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
 static int AES_256_GCM_readKeyFile(AES_256_GCM* a2gObject)
 {
     int httpStatus = 500;
-    FileGeneration fileGeneration;
-    FileGeneration__constructor(&fileGeneration);
-    if (AES_256_GCM_checkFileExisted() == 200)
-    {
-        fileGeneration.pf__readFile((unsigned char*)AES_256_GCM_KEY_LOCATION,
-        a2gObject->masterKey,
-        (unsigned char*)"rb",
-        1,
-        AES_256_GCM_KEY_SIZE);
+    if (AES_256_GCM_checkFileExisted(a2gObject) == 200) {
+        (a2gObject->fileGeneration).pf__readFile(&(a2gObject->fileGeneration), (unsigned char*)AES_256_GCM_KEY_LOCATION, a2gObject->masterKey, (unsigned char*)"rb", 1, AES_256_GCM_KEY_SIZE);
     } else {
         httpStatus = 500;
     }
@@ -350,10 +345,10 @@ static int AES_256_GCM_readKeyFile(AES_256_GCM* a2gObject)
     return httpStatus;
 }
 
-
 /**
  * Initialization of the key file in the installation process.
  *
+ * @param pEnc Encode* The address of the encryption object
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
@@ -361,14 +356,15 @@ static int AES_256_GCM_initializeMasterKey(Encode* pEnc)
 {
     AES_256_GCM* a2gObject = NULL;
     a2gObject = (AES_256_GCM*)pEnc;
-    int httpStatus = 500 ;
+    int httpStatus = 500;
 
-    if (AES_256_GCM_checkDirArchitecture() != 200) {
+    if (AES_256_GCM_checkDirArchitecture(a2gObject) != 200) {
         return httpStatus;
     }
 
-    httpStatus = AES_256_GCM_checkFileExisted();
-    if(httpStatus == 500) {
+    httpStatus = AES_256_GCM_checkFileExisted(a2gObject);
+
+    if (httpStatus == 500) {
         httpStatus = AES_256_GCM_generateMasterKey(a2gObject);
     }
 
@@ -376,15 +372,39 @@ static int AES_256_GCM_initializeMasterKey(Encode* pEnc)
 }
 
 /**
- * A process to maintain the directories from the path
+ * Setting the project path
  *
+ * @param pEnc Encode* The address of the encryption object
+ * @param projectPath unsigned char* The project path
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
-static int AES_256_GCM_checkDirArchitecture() {
+static int AES_256_GCM_setProjectPath(Encode* pEnc, unsigned char* projectPath)
+{
+    AES_256_GCM* a2gObject = NULL;
+    a2gObject = (AES_256_GCM*)pEnc;
     int httpStatus = 500;
-    FileGeneration fileGeneration;
-    FileGeneration__constructor(&fileGeneration);
-    httpStatus = fileGeneration.pf__checkDirArchitecture((unsigned char*)AES_256_GCM_KEY_LOCATION);
+
+    httpStatus = (a2gObject->fileGeneration).pf__setProjectPath(
+        &(a2gObject->fileGeneration),
+        projectPath
+    );
+
+    return httpStatus;
+}
+
+
+/**
+ * A process to maintain the directories from the path
+ *
+ * @param a2gObject AES_256_GCM* The address of the AES_256_GCM instance
+ * @return int HTTP response status codes, more information can be referred
+ * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+ */
+static int AES_256_GCM_checkDirArchitecture(AES_256_GCM* a2gObject)
+{
+    int httpStatus = 500;
+
+    httpStatus = (a2gObject->fileGeneration).pf__checkDirArchitecture(&(a2gObject->fileGeneration), (unsigned char*)AES_256_GCM_KEY_LOCATION);
     return httpStatus;
 }

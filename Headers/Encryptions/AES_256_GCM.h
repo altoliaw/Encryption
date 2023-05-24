@@ -33,12 +33,13 @@ struct AES_256_GCM {
   int (*pf__checkFileExisted)(AES_256_GCM*);
 
   // Protected variables
+  FileGeneration fileGeneration;
   unsigned char masterKey[AES_256_GCM_KEY_SIZE];
 };
 
 // Method declarations
 void AES_256_GCM__constructor(AES_256_GCM*);
-void AES_256_GCM__destructor(const AES_256_GCM*);
+void AES_256_GCM__destructor(AES_256_GCM*);
 
 // External variables & functions
 extern void Encode__extension(const Encode*);

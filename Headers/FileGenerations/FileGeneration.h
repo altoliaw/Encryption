@@ -21,22 +21,29 @@
 #include <unistd.h> // For obtaining the location in the system
 #include <dirent.h> // Iteration from a folder on linux platform
 #endif
-#include <sys/stat.h> // "mkdir" on linux platform
+#include <sys/stat.h> // "mkdir" on linux/Windows platform
 #include <sys/types.h> // Iteration from a folder on linux platform
 
-#define FILE_GENERATION_PROJECT_PATH_SIZE 256 // 256 bytes
+#define FILE_GENERATION_PROJECT_PATH_SIZE 512 // 512 bytes
+#define DEFAULT_CURRENT_WORKING_DIRECTORY 1 // The status for the current working directory being used;
+//0 implies the current working directory is not used.
+//Any values except 0 shows the current working directory will be used.
 
 // Class declarations
 typedef struct FileGeneration FileGeneration;
 
 // Class body
 struct FileGeneration {
-  int (*pf__checkFileExisted)(unsigned char*);
-  int (*pf__getProjectPath)(unsigned char*);
+  unsigned int defaultCurrentWorkingDirectory;
+  unsigned char currentWorkingDirectory[FILE_GENERATION_PROJECT_PATH_SIZE];
+
+  int (*pf__checkFileExisted)(FileGeneration*, unsigned char*);
+  int (*pf__setProjectPath)(FileGeneration*, unsigned char*);
+  int (*pf__getProjectPath)(FileGeneration*, unsigned char*);
   int (*pf__makeDir)(unsigned char*);
-  int (*pf__writeFile)(unsigned char*, unsigned char const*, int, unsigned char*);
-  int (*pf__readFile)(unsigned char*, unsigned char*, unsigned char*, int, int);
-  int (*pf__checkDirArchitecture)(unsigned char*);
+  int (*pf__writeFile)(FileGeneration*, unsigned char*, unsigned char const*, int, unsigned char*);
+  int (*pf__readFile)(FileGeneration*, unsigned char*, unsigned char*, unsigned char*, int, int);
+  int (*pf__checkDirArchitecture)(FileGeneration*, unsigned char*);
 };
 
 // Method declarations
