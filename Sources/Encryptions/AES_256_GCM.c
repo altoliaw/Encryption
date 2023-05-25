@@ -67,7 +67,7 @@ static int AES_256_GCM_encryption(
 
     httpStatus = AES_256_GCM_checkFileExisted(pA2gObject);
     if (httpStatus != 200) {
-        printf("Key Lost.\n");
+        fprintf(stderr, "Key Lost.\n");
         return 500;
     }
 
@@ -84,34 +84,34 @@ static int AES_256_GCM_encryption(
 
         // New an instance
         if (!(ecCtx = EVP_CIPHER_CTX_new())) {
-            printf("EVP_CIPHER_CTX_new\n");
+            fprintf(stderr, "EVP_CIPHER_CTX_new\n");
             return 500;
         }
 
         // Initialize encryption approach
         if (EVP_EncryptInit_ex(ecCtx, EVP_aes_256_gcm(), NULL, NULL, NULL) != 1) {
-            printf("EVP_EncryptInit_ex\n");
+            fprintf(stderr, "EVP_EncryptInit_ex\n");
             EVP_CIPHER_CTX_free(ecCtx);
             return 500;
         }
 
         // Set the GCM with the IV_SIZE
         if (EVP_CIPHER_CTX_ctrl(ecCtx, EVP_CTRL_GCM_SET_IVLEN, AES_256_GCM_IV_SIZE, NULL) != 1) {
-            printf("EVP_CIPHER_CTX_ctrl\n");
+            fprintf(stderr, "EVP_CIPHER_CTX_ctrl\n");
             EVP_CIPHER_CTX_free(ecCtx);
             return 500;
         }
 
         // Set the encryption key and iv values
         if (EVP_EncryptInit_ex(ecCtx, NULL, NULL, key, iv) != 1) {
-            printf("EVP_EncryptInit_ex\n");
+            fprintf(stderr, "EVP_EncryptInit_ex\n");
             EVP_CIPHER_CTX_free(ecCtx);
             return 500;
         }
 
         // Encryption process
         if (EVP_EncryptUpdate(ecCtx, ciphertext, &currentLen, plaintext, plaintextLen) != 1) {
-            printf("EVP_EncryptUpdate\n");
+            fprintf(stderr, "EVP_EncryptUpdate\n");
             EVP_CIPHER_CTX_free(ecCtx);
             return 500;
         }
@@ -119,7 +119,7 @@ static int AES_256_GCM_encryption(
 
         // The last encryption of GCM
         if (EVP_EncryptFinal_ex(ecCtx, ciphertext + currentLen, &currentLen) != 1) {
-            printf("EVP_EncryptFinal_ex\n");
+            fprintf(stderr, "EVP_EncryptFinal_ex\n");
             EVP_CIPHER_CTX_free(ecCtx);
             return 500;
         }
@@ -127,6 +127,7 @@ static int AES_256_GCM_encryption(
 
         // Insert authentication tag
         if (EVP_CIPHER_CTX_ctrl(ecCtx, EVP_CTRL_GCM_GET_TAG, 16, authTag) != 1) {
+            fprintf(stderr, "EVP_CIPHER_CTX_ctrl\n");
             EVP_CIPHER_CTX_free(ecCtx);
             return 500;
         }
@@ -178,7 +179,7 @@ static int AES_256_GCM_decryption(
     int httpStatus = 500;
     httpStatus = AES_256_GCM_checkFileExisted(pA2gObject);
     if (httpStatus != 200) {
-        printf("Key Lost.\n");
+        fprintf(stderr, "Key Lost.\n");
         return 500;
     }
 
@@ -205,36 +206,41 @@ static int AES_256_GCM_decryption(
 
     // Creating an instance
     if (!(ecCtx = EVP_CIPHER_CTX_new())) {
-        printf("EVP_CIPHER_CTX_new\n");
+        fprintf(stderr, "EVP_CIPHER_CTX_new\n");
         return 500;
     }
 
     // Initializing the decryption operation
     if (!EVP_DecryptInit_ex(ecCtx, EVP_aes_256_gcm(), NULL, NULL, NULL)) {
+        fprintf(stderr, "EVP_DecryptInit_ex\n");
         EVP_CIPHER_CTX_free(ecCtx);
         return 500;
     }
 
     // Setting iv length
     if (!EVP_CIPHER_CTX_ctrl(ecCtx, EVP_CTRL_GCM_SET_IVLEN, AES_256_GCM_IV_SIZE, NULL)) {
+        fprintf(stderr, "EVP_CIPHER_CTX_ctrl\n");
         EVP_CIPHER_CTX_free(ecCtx);
         return 500;
     }
 
     // Initializing key and iv
     if (!EVP_DecryptInit_ex(ecCtx, NULL, NULL, key, iv)) {
+        fprintf(stderr, "EVP_DecryptInit_ex\n");
         EVP_CIPHER_CTX_free(ecCtx);
         return 500;
     }
 
     // Providing the authenticated tag
     if (!EVP_CIPHER_CTX_ctrl(ecCtx, EVP_CTRL_GCM_SET_TAG, AES_256_GCM_TAG_SIZE, authTag)) {
+        fprintf(stderr, "EVP_CIPHER_CTX_ctrl\n");
         EVP_CIPHER_CTX_free(ecCtx);
         return 500;
     }
 
     // Decrypting plaintext
     if (!EVP_DecryptUpdate(ecCtx, plaintext, &currentLen, ciphertext, ciphertextLen)) {
+        fprintf(stderr, "EVP_DecryptUpdate\n");
         EVP_CIPHER_CTX_free(ecCtx);
         return 500;
     }
