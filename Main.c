@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
     //iHttpNum = ___initializeServerKey((unsigned char*)"AES_256_GCM");
     //printf("http code is %d\n", iHttpNum);
 
-    /*
+
     int iLen = 0;
     unsigned char buffer[2060];
     unsigned char tag[16];
@@ -50,11 +50,11 @@ int main(int argc, char *argv[]) {
         (unsigned char* )"AES_256_GCM"
     );
 
-    printf("en iHttpNum is %d\n", iHttpNum);
+    printf("HttpNum is %d\n", iHttpNum);
     if (iHttpNum == 200) {
         printf("The plaintext is %s\n", decryptedBuffer);
         printf("The length of the plainText %d\n", iDLen);
     }
-    */
+
     return 0;
 }

@@ -64,10 +64,6 @@ static int AES_256_GCM_encryption(
     int httpStatus = 500;
     AES_256_GCM* pA2gObject = (AES_256_GCM*)pEnc;
     unsigned char const* key = pA2gObject->masterKey;
-    for(int i = 0; i < AES_256_GCM_KEY_SIZE; i++){
-        printf("%c",key[i]);
-    }
-    printf("\n");
 
     httpStatus = AES_256_GCM_checkFileExisted(pA2gObject);
     if (httpStatus != 200) {
@@ -178,11 +174,6 @@ static int AES_256_GCM_decryption(
 
     AES_256_GCM* pA2gObject = (AES_256_GCM*)pEnc;
     unsigned char const* key = pA2gObject->masterKey;
-    for(int i = 0; i < AES_256_GCM_KEY_SIZE; i++){
-        printf("%c",key[i]);
-    }
-    printf("\n");
-
 
     int httpStatus = 500;
     httpStatus = AES_256_GCM_checkFileExisted(pA2gObject);
