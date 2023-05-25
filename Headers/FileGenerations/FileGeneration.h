@@ -34,7 +34,7 @@ typedef struct FileGeneration FileGeneration;
 
 // Class body
 struct FileGeneration {
-  unsigned int defaultCurrentWorkingDirectory;
+  int isInitialized;
   unsigned char currentWorkingDirectory[FILE_GENERATION_PROJECT_PATH_SIZE];
 
   int (*pf__checkFileExisted)(FileGeneration*, unsigned char*);

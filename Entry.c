@@ -23,7 +23,9 @@ int ___encryption(
         unsigned char* tag,
         unsigned char* approach) {
 
-    EncodeDispatcher__constructor(&__encDisObject__);
+    if(__encDisObject__.isInitialized != 1) {
+        EncodeDispatcher__constructor(&__encDisObject__);
+    }
 
     int httpStatus = 500;
     httpStatus = __encDisObject__.pf__encryption(
@@ -57,7 +59,9 @@ int ___decryption(
     unsigned char* tag,
     unsigned char* approach) {
 
-    EncodeDispatcher__constructor(&__encDisObject__);
+    if(__encDisObject__.isInitialized != 1) {
+        EncodeDispatcher__constructor(&__encDisObject__);
+    }
     int httpStatus = 500;
     httpStatus = __encDisObject__.pf__decryption(
         ciphertext,
@@ -78,8 +82,28 @@ int ___decryption(
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
 int ___initializeServerKey(unsigned char* approach) {
-    EncodeDispatcher__constructor(&__encDisObject__);
+    if(__encDisObject__.isInitialized != 1) {
+        EncodeDispatcher__constructor(&__encDisObject__);
+    }
     int httpStatus = 500;
     httpStatus = __encDisObject__.pf__initializeServerKey(approach);
+    return httpStatus;
+}
+
+/**
+ * Project path setting
+ *
+ * @param approach unsigned char* The approaches for decryption
+ * @param projectPath usigned char* The project path
+ * @return int HTTP response status codes, more information can be referred
+ * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+ */
+int ___setProjectPath(unsigned char* approach, unsigned char* projectPath) {
+    if(__encDisObject__.isInitialized != 1) {
+        EncodeDispatcher__constructor(&__encDisObject__);
+    }
+
+    int httpStatus = 500;
+    httpStatus = __encDisObject__.pf__setProjectPath(approach, projectPath);
     return httpStatus;
 }

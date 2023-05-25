@@ -22,6 +22,7 @@ PjN:= $(word $(words $(subst /, ,${Prdir})), $(subst /, ,${Prdir}))
 
 .Phony: all
 all: ${Prdir}/${PjN}
+	make run
 
 .Phony: build
 build: ${Prdir}/${PjN}/build

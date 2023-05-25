@@ -17,9 +17,11 @@
   EXPORT int ___encryption(const unsigned char*, const int, unsigned char*, int*, unsigned char*, unsigned char*);
   EXPORT int ___decryption(unsigned char*, int, unsigned char*, int*, unsigned char*, unsigned char*);
   EXPORT int ___initializeServerKey(unsigned char*);
+  EXPORT int ___setProjectPath(unsigned char*, unsigned char*);
 
 #else
   __attribute__((visibility("default"))) int ___encryption(const unsigned char*, const int, unsigned char*, int*, unsigned char*, unsigned char*);
   __attribute__((visibility("default"))) int ___decryption(unsigned char*, int, unsigned char*, int*, unsigned char*, unsigned char*);
   __attribute__((visibility("default"))) int ___initializeServerKey(unsigned char*);
+  __attribute__((visibility("default"))) int ___setProjectPath(unsigned char*, unsigned char*);
 #endif

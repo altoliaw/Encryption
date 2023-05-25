@@ -13,6 +13,13 @@ static int AES_256_GCM_checkDirArchitecture(AES_256_GCM*);
 
 void AES_256_GCM__constructor(AES_256_GCM* a2gObject)
 {
+    a2gObject->isInitialized = 1;
+
+    // FileGeneration constructor
+    if((a2gObject->fileGeneration).isInitialized != 1) {
+        FileGeneration__constructor(&(a2gObject->fileGeneration));
+    }
+
     // Inheritance
     Encode__extension(&(a2gObject->o_Encode));
     // Class methods overloading (parent class)
@@ -25,9 +32,6 @@ void AES_256_GCM__constructor(AES_256_GCM* a2gObject)
     // Class methods
     a2gObject->pf__checkFileExisted = &AES_256_GCM_checkFileExisted;
     AES_256_GCM_getMasterKey(a2gObject);
-
-    // FileGeneration constructor
-    FileGeneration__constructor(&(a2gObject->fileGeneration));
 }
 
 void AES_256_GCM__destructor(AES_256_GCM* a2gObject)
@@ -60,6 +64,10 @@ static int AES_256_GCM_encryption(
     int httpStatus = 500;
     AES_256_GCM* pA2gObject = (AES_256_GCM*)pEnc;
     unsigned char const* key = pA2gObject->masterKey;
+    for(int i = 0; i < AES_256_GCM_KEY_SIZE; i++){
+        printf("%c",key[i]);
+    }
+    printf("\n");
 
     httpStatus = AES_256_GCM_checkFileExisted(pA2gObject);
     if (httpStatus != 200) {
@@ -170,6 +178,11 @@ static int AES_256_GCM_decryption(
 
     AES_256_GCM* pA2gObject = (AES_256_GCM*)pEnc;
     unsigned char const* key = pA2gObject->masterKey;
+    for(int i = 0; i < AES_256_GCM_KEY_SIZE; i++){
+        printf("%c",key[i]);
+    }
+    printf("\n");
+
 
     int httpStatus = 500;
     httpStatus = AES_256_GCM_checkFileExisted(pA2gObject);
@@ -285,8 +298,8 @@ static int AES_256_GCM_getMasterKey(AES_256_GCM* a2gObject)
 {
     int httpStatus = 500;
     int tmpKeyLength = 0;
-    tmpKeyLength = (int)strlen((char*)a2gObject->masterKey);
 
+    tmpKeyLength = (int)strlen((char*)a2gObject->masterKey);
     if (tmpKeyLength <= 0 && AES_256_GCM_checkFileExisted(a2gObject) == 200) {
         AES_256_GCM_readKeyFile(a2gObject);
         httpStatus = 200;
@@ -320,7 +333,6 @@ static int AES_256_GCM_getIV(unsigned char* pivValue)
 static int AES_256_GCM_checkFileExisted(AES_256_GCM* a2gObject)
 {
     int httpStatus = 500; // false flag
-
     httpStatus = (a2gObject->fileGeneration).pf__checkFileExisted(&(a2gObject->fileGeneration), (unsigned char*)AES_256_GCM_KEY_LOCATION);
 
     return httpStatus;
@@ -336,6 +348,7 @@ static int AES_256_GCM_checkFileExisted(AES_256_GCM* a2gObject)
 static int AES_256_GCM_readKeyFile(AES_256_GCM* a2gObject)
 {
     int httpStatus = 500;
+    //printf("AES_256_GCM_readKeyFile\n");
     if (AES_256_GCM_checkFileExisted(a2gObject) == 200) {
         (a2gObject->fileGeneration).pf__readFile(&(a2gObject->fileGeneration), (unsigned char*)AES_256_GCM_KEY_LOCATION, a2gObject->masterKey, (unsigned char*)"rb", 1, AES_256_GCM_KEY_SIZE);
     } else {
@@ -385,10 +398,17 @@ static int AES_256_GCM_setProjectPath(Encode* pEnc, unsigned char* projectPath)
     a2gObject = (AES_256_GCM*)pEnc;
     int httpStatus = 500;
 
-    httpStatus = (a2gObject->fileGeneration).pf__setProjectPath(
-        &(a2gObject->fileGeneration),
-        projectPath
-    );
+    if (strcmp((char*)projectPath, "") == 0) {
+        httpStatus = (a2gObject->fileGeneration).pf__setProjectPath(
+            &(a2gObject->fileGeneration),
+            (unsigned char*)""
+        );
+    } else {
+        httpStatus = (a2gObject->fileGeneration).pf__setProjectPath(
+            &(a2gObject->fileGeneration),
+            projectPath
+        );
+    }
 
     return httpStatus;
 }

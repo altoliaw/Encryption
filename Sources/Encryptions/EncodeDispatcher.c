@@ -12,6 +12,8 @@ static Encode* EncodeDispatcher_createEncryptedObject(unsigned char*);
 
 void EncodeDispatcher__constructor(EncodeDispatcher* encObject)
 {
+    //printf("EncodeDispatcher__constructor\n");
+    encObject->isInitialized = 1;
     encObject->pf__encryption = &EncodeDispatcher_encryption;
     encObject->pf__decryption = &EncodeDispatcher_decryption;
     encObject->pf__initializeServerKey = &EncodeDispatcher_initializeServerKey;
@@ -119,6 +121,7 @@ static int EncodeDispatcher_setProjectPath(unsigned char* approach, unsigned cha
 {
     Encode* pEnc = NULL;
     pEnc = EncodeDispatcher_createEncryptedObject(approach);
+    //printf("EncodeDispatcher_setProjectPath\n");
 
     // Definition of function variable & execution of the function
     int (*dispatcher)(Encode*, unsigned char*);
@@ -246,10 +249,13 @@ static int (*EncodeDispatcher_setProjectPathDispatcher(unsigned char* approach, 
 static Encode* EncodeDispatcher_createEncryptedObject(unsigned char* approach)
 {
     Encode* pObject = NULL;
-
+    //printf("EncodeDispatcher_createEncryptedObject\n");
     if (!strcmp((char*)approach, "AES_256_GCM")) {
         static AES_256_GCM __a2gObject;
-        AES_256_GCM__constructor(&__a2gObject);
+        //printf("%d\n", __a2gObject.isInitialized);
+        if(__a2gObject.isInitialized != 1) {
+            AES_256_GCM__constructor(&__a2gObject);
+        }
         pObject = (Encode*)(&__a2gObject);
     }
     return pObject;

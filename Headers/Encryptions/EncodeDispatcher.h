@@ -16,6 +16,7 @@ typedef struct EncodeDispatcher EncodeDispatcher;
 
 // Class body
 struct EncodeDispatcher {
+  int isInitialized;
 
   // Public variables to constructor/destructor functions
   int (*pf__encryption)(const unsigned char*, const int, unsigned char*, int*, unsigned char*, unsigned char*);

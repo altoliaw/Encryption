@@ -6,15 +6,19 @@
 */
 int main(int argc, char *argv[]) {
     int iHttpNum = 0;
-    iHttpNum = ___initializeServerKey((unsigned char*)"AES_256_GCM");
-    printf("http code is %d\n", iHttpNum);
+    unsigned char* projectPath = (unsigned char*)"/home/nick/Workspace/C/Encryption";
+    iHttpNum = ___setProjectPath((unsigned char*)"AES_256_GCM", projectPath);
+    //printf("http code is %d\n", iHttpNum);
+    //iHttpNum = ___initializeServerKey((unsigned char*)"AES_256_GCM");
+    //printf("http code is %d\n", iHttpNum);
+
     /*
     int iLen = 0;
     unsigned char buffer[2060];
     unsigned char tag[16];
     memset(buffer,'\0', 2060);
     unsigned char* str = (unsigned char*)"bbbbbb is apple;a is apple;a is apple;a is apple;a is apple;a is apple;a is apple;a is apple;a is apple;a is apple;a is apple;a is apple;a is apple;a is apple;a is apple;";
-    int iHttpNum = 0;
+    iHttpNum = 0;
     printf("The plaintext is %d\n", (int)strlen((char*)str));
 
     iHttpNum = ___encryption(

@@ -28,6 +28,7 @@ typedef struct AES_256_GCM AES_256_GCM;
 // Class body
 struct AES_256_GCM {
 
+  int isInitialized;
   // Public variables
   Encode o_Encode;
   int (*pf__checkFileExisted)(AES_256_GCM*);

@@ -11,6 +11,8 @@ static int FileGeneration_checkDirArchitecture(FileGeneration*, unsigned char*);
 // Method definitions
 void FileGeneration__constructor(FileGeneration* oFG)
 {
+    //printf("FileGeneration__constructor\n");
+    oFG->isInitialized = 1;
     oFG->pf__checkFileExisted = &FileGeneration_checkFileExisted;
     oFG->pf__setProjectPath = &FileGeneration_setProjectPath;
     oFG->pf__getProjectPath = &FileGeneration_getProjectPath;
@@ -20,7 +22,6 @@ void FileGeneration__constructor(FileGeneration* oFG)
     oFG->pf__checkDirArchitecture = &FileGeneration_checkDirArchitecture;
 
     memset(oFG->currentWorkingDirectory, (unsigned char)'\0', FILE_GENERATION_PROJECT_PATH_SIZE);
-    oFG->defaultCurrentWorkingDirectory = DEFAULT_CURRENT_WORKING_DIRECTORY;
 }
 void FileGeneration__destructor(const FileGeneration*)
 {
@@ -172,11 +173,12 @@ static int FileGeneration_checkFileExisted(FileGeneration* oFG,  unsigned char* 
 static int FileGeneration_setProjectPath(FileGeneration* oFG, unsigned char* projectPath)
 {
     int httpStatus = 200;
-    if(oFG->defaultCurrentWorkingDirectory != 0) {
+    if(strcmp((char*)projectPath, "") != 0) {
         int length = (int)strlen((char*)projectPath);
         memcpy(oFG->currentWorkingDirectory, projectPath, length);
         oFG->currentWorkingDirectory[length] = (unsigned char)'\0';
     }
+    printf("FileGeneration_setProjectPath | Set project path: %s\n", oFG->currentWorkingDirectory);
     return httpStatus;
 }
 
@@ -194,7 +196,7 @@ static int FileGeneration_getProjectPath(FileGeneration* oFG, unsigned char* pro
 {
     int httpStatus = 200;
     char buffer[FILE_GENERATION_PROJECT_PATH_SIZE];
-    if (oFG->defaultCurrentWorkingDirectory != 0 && strlen((char*)oFG->currentWorkingDirectory) != 0) {
+    if (strlen((char*)oFG->currentWorkingDirectory) != 0) {
         int length = 0;
         length = (int)strlen((char*)oFG->currentWorkingDirectory);
         memcpy(projectPath, oFG->currentWorkingDirectory, length);
@@ -213,12 +215,6 @@ static int FileGeneration_getProjectPath(FileGeneration* oFG, unsigned char* pro
     #endif
 
         if (httpStatus == 200) {
-            // If the `DEFAULT_CURRENT_WORKING_DIRECTORY` variable is not equal to zero (i.e.,
-            // the value represents that the current working directory shall be set by users), the current working directory
-            // will be returned with the default path but the returned value will be 500.
-            if(oFG->defaultCurrentWorkingDirectory != 0 && strlen((char*)oFG->currentWorkingDirectory) == 0){
-                httpStatus = 500;
-            }
             memcpy(projectPath, buffer, (sizeof(buffer) * sizeof(char)));
             int length =  (int) strlen((char*)projectPath);
             memcpy(oFG->currentWorkingDirectory, projectPath, length);
@@ -294,7 +290,7 @@ static int FileGeneration_writeFile(
         return httpStatus;
     }
     memcpy((projectPath + length - 1), filePath, (int)strlen((char*)filePath));
-    projectPath[(length - 1 + (int)strlen((char*)filePath))] = '\0';
+    projectPath[length - 1 + (int)strlen((char*)filePath)] = '\0';
 
     // Opening file by using fopen function
     FILE* pFilePtr = NULL;
@@ -354,7 +350,7 @@ static int FileGeneration_readFile(
     }
 
     memcpy((projectPath + length - 1), filePath, (int)strlen((char*)filePath));
-    projectPath[(length - 1 + (int)strlen((char*)filePath))] = '\0';
+    projectPath[length - 1 + (int)strlen((char*)filePath)] = '\0';
 
     // Opening file by using fopen function
     FILE* pFilePtr = NULL;
@@ -439,20 +435,5 @@ static int FileGeneration_checkDirArchitecture(FileGeneration* oFG, unsigned cha
         }
     }
 
-    return httpStatus;
-}
-
-/**
- * A process to maintain the directories from the path
- *
- * @param oFG FileGeneration* The address of the instance of the class
- * @param value
- * @return int HTTP response status codes, more information can be referred
- * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
- */
-static int FileGeneration_setDefaultCurrentWorkingDirectoryValue(FileGeneration* oFG, unsigned int workingValue)
-{
-    int httpStatus =200;
-    oFG->defaultCurrentWorkingDirectory = (workingValue > 0) ? 1 : 0;
     return httpStatus;
 }
