@@ -10,9 +10,9 @@
 #include <stdio.h>
 
 // Files included
-#include "./Encryptions/EncodeDispatcher.h"
+#include "./Encryptions/EncryptionDispatcher.h"
 #include "./FileGenerations/FileGeneration.h"
 
 
 
-extern void EncodeDispatcher__constructor(EncodeDispatcher*);
+extern void EncryptionDispatcher__constructor(EncryptionDispatcher*);

@@ -1,6 +1,6 @@
 #pragma once
 /**
- * To support multiple encode approaches, all encoding classes are modelled in the factory pattern.
+ * To support multiple encryption approaches, all encoding classes are modelled in the factory pattern.
  * This class is a dispatcher and determines which type of encoding object shall be generated.
  *
  * @author Nick
@@ -8,14 +8,14 @@
  */
 
 // Files included
-#include "./Encode.h"
+#include "./Encryption.h"
 #include "./AES_256_GCM.h"
 
 // Class declarations
-typedef struct EncodeDispatcher EncodeDispatcher;
+typedef struct EncryptionDispatcher EncryptionDispatcher;
 
 // Class body
-struct EncodeDispatcher {
+struct EncryptionDispatcher {
   int isInitialized;
 
   // Public variables to constructor/destructor functions
@@ -26,8 +26,8 @@ struct EncodeDispatcher {
 };
 
 // Method declarations
-void EncodeDispatcher__constructor(EncodeDispatcher*);
-void EncodeDispatcher__destructor(const EncodeDispatcher*);
+void EncryptionDispatcher__constructor(EncryptionDispatcher*);
+void EncryptionDispatcher__destructor(const EncryptionDispatcher*);
 
 // External functions
 extern void AES_256_GCM__constructor(AES_256_GCM* a2gObject);

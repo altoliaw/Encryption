@@ -14,7 +14,7 @@
 #include <openssl/rand.h>
 
 // Files included
-#include "Encode.h"
+#include "Encryption.h"
 #include "../FileGenerations/FileGeneration.h"
 
 #define AES_256_GCM_KEY_SIZE 32 // 256 bits
@@ -30,7 +30,7 @@ struct AES_256_GCM {
 
   int isInitialized;
   // Public variables
-  Encode o_Encode;
+  Encryption o_Encryption;
   int (*pf__checkFileExisted)(AES_256_GCM*);
 
   // Protected variables
@@ -43,5 +43,5 @@ void AES_256_GCM__constructor(AES_256_GCM*);
 void AES_256_GCM__destructor(AES_256_GCM*);
 
 // External variables & functions
-extern void Encode__extension(const Encode*);
+extern void Encryption__extension(const Encryption*);
 extern void FileGeneration__constructor(FileGeneration*);

@@ -42,23 +42,23 @@ run:
 ##================================================================
 # Build libraries
 ${Prdir}/${PjN}/build : 	${Prdir}/Entry.o \
-							${Sources}/Encryptions/EncodeDispatcher.o \
-							${Sources}/Encryptions/Encode.o \
+							${Sources}/Encryptions/EncryptionDispatcher.o \
+							${Sources}/Encryptions/Encryption.o \
 							${Sources}/Encryptions/AES_256_GCM.o \
 							${Sources}/FileGenerations/FileGeneration.o
 
 # Create a module
 ${Prdir}/${PjN}: 	${Prdir}/Main.o \
 					${Prdir}/Entry.o \
-					${Sources}/Encryptions/EncodeDispatcher.o \
-					${Sources}/Encryptions/Encode.o \
+					${Sources}/Encryptions/EncryptionDispatcher.o \
+					${Sources}/Encryptions/Encryption.o \
 					${Sources}/Encryptions/AES_256_GCM.o \
 					${Sources}/FileGenerations/FileGeneration.o
 
 	${Cmp} ${Stdlib} ${Cmpopt} ${Detinfo} ${Wall} ${Fsg} -o ${Prdir}/${PjN} ${Prdir}/Main.o \
 	${Prdir}/Entry.o \
-	${Sources}/Encryptions/EncodeDispatcher.o \
-	${Sources}/Encryptions/Encode.o \
+	${Sources}/Encryptions/EncryptionDispatcher.o \
+	${Sources}/Encryptions/Encryption.o \
 	${Sources}/Encryptions/AES_256_GCM.o \
 	${Sources}/FileGenerations/FileGeneration.o \
 	-lssl -lcrypto
@@ -68,19 +68,19 @@ ${Prdir}/Main.o:	${Headers}/Entry.h ${Prdir}/Main.c
 	${Cmp} ${Stdlib} ${Cmpopt} ${Detinfo} ${Wall} ${Prdir}/Main.c -c ${Fsg} -o ${Prdir}/Main.o
 
 # Entry.o
-${Prdir}/Entry.o:	${Headers}/Entry.h ${Headers}/Header.h ${Headers}/Encryptions/EncodeDispatcher.h ${Prdir}/Entry.c
+${Prdir}/Entry.o:	${Headers}/Entry.h ${Headers}/Header.h ${Headers}/Encryptions/EncryptionDispatcher.h ${Prdir}/Entry.c
 	${Cmp} ${Stdlib} ${Cmpopt} ${Detinfo} ${Wall} ${Prdir}/Entry.c -c ${Fsg} -o ${Prdir}/Entry.o
 
-# EncodeDispatcher
-${Sources}/Encryptions/EncodeDispatcher.o:	${Headers}/Encryptions/EncodeDispatcher.h ${Headers}/Encryptions/Encode.h ${Headers}/Encryptions/AES_256_GCM.h ${Sources}/Encryptions/EncodeDispatcher.c
-	${Cmp} ${Stdlib} ${Cmpopt} ${Detinfo} ${Wall} ${Sources}/Encryptions/EncodeDispatcher.c -c ${Fsg} -o ${Sources}/Encryptions/EncodeDispatcher.o ${OpenSSL3}
+# EncryptionDispatcher
+${Sources}/Encryptions/EncryptionDispatcher.o:	${Headers}/Encryptions/EncryptionDispatcher.h ${Headers}/Encryptions/Encryption.h ${Headers}/Encryptions/AES_256_GCM.h ${Sources}/Encryptions/EncryptionDispatcher.c
+	${Cmp} ${Stdlib} ${Cmpopt} ${Detinfo} ${Wall} ${Sources}/Encryptions/EncryptionDispatcher.c -c ${Fsg} -o ${Sources}/Encryptions/EncryptionDispatcher.o ${OpenSSL3}
 
-# Encode
-${Sources}/Encryptions/Encode.o:	${Headers}/Encryptions/Encode.h ${Headers}/Encryptions/Encode.h ${Headers}/Encryptions/AES_256_GCM.h ${Sources}/Encryptions/Encode.c
-	${Cmp} ${Stdlib} ${Cmpopt} ${Detinfo} ${Wall} ${Sources}/Encryptions/Encode.c -c ${Fsg} -o ${Sources}/Encryptions/Encode.o ${OpenSSL3}
+# Encryption
+${Sources}/Encryptions/Encryption.o:	${Headers}/Encryptions/Encryption.h ${Headers}/Encryptions/Encryption.h ${Headers}/Encryptions/AES_256_GCM.h ${Sources}/Encryptions/Encryption.c
+	${Cmp} ${Stdlib} ${Cmpopt} ${Detinfo} ${Wall} ${Sources}/Encryptions/Encryption.c -c ${Fsg} -o ${Sources}/Encryptions/Encryption.o ${OpenSSL3}
 
 # AES_256_GCM
-${Sources}/Encryptions/AES_256_GCM.o:	${Headers}/FileGenerations/FileGeneration.h ${Headers}/Encryptions/AES_256_GCM.h ${Headers}/Encryptions/Encode.h ${Sources}/Encryptions/AES_256_GCM.c
+${Sources}/Encryptions/AES_256_GCM.o:	${Headers}/FileGenerations/FileGeneration.h ${Headers}/Encryptions/AES_256_GCM.h ${Headers}/Encryptions/Encryption.h ${Sources}/Encryptions/AES_256_GCM.c
 	${Cmp} ${Stdlib} ${Cmpopt} ${Detinfo} ${Wall} ${Sources}/Encryptions/AES_256_GCM.c -c ${Fsg} -o ${Sources}/Encryptions/AES_256_GCM.o ${OpenSSL3}
 
 # FileGeneration

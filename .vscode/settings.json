@@ -1,7 +1,6 @@
 {
     "files.associations": {
         "stdio.h": "c",
-        "encode.h": "c",
         "header.h": "c",
         "encodedispatcher.h": "c",
         "aes_256_gcm.h": "c",
@@ -9,7 +8,8 @@
         "stat.h": "c",
         "rand.h": "c",
         "evp.h": "c",
-        "entry.h": "c"
+        "entry.h": "c",
+        "encryption.h": "c"
     },
     "sonarlint.pathToCompileCommands": "${workspaceFolder}/.vscode/compile_commands.json",
     "C_Cpp.errorSquiggles": "disabled"

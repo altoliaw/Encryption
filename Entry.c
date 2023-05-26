@@ -1,7 +1,7 @@
 #include "./Headers/Entry.h"
 
 // Global variable
-static EncodeDispatcher __encDisObject__;
+static EncryptionDispatcher __encDisObject__;
 
 /**
  * An entry point of encryption for dynamical links. (.so, or .dll)
@@ -24,7 +24,7 @@ int ___encryption(
         unsigned char* approach) {
 
     if(__encDisObject__.isInitialized != 1) {
-        EncodeDispatcher__constructor(&__encDisObject__);
+        EncryptionDispatcher__constructor(&__encDisObject__);
     }
 
     int httpStatus = 500;
@@ -60,7 +60,7 @@ int ___decryption(
     unsigned char* approach) {
 
     if(__encDisObject__.isInitialized != 1) {
-        EncodeDispatcher__constructor(&__encDisObject__);
+        EncryptionDispatcher__constructor(&__encDisObject__);
     }
     int httpStatus = 500;
     httpStatus = __encDisObject__.pf__decryption(
@@ -83,7 +83,7 @@ int ___decryption(
  */
 int ___initializeServerKey(unsigned char* approach) {
     if(__encDisObject__.isInitialized != 1) {
-        EncodeDispatcher__constructor(&__encDisObject__);
+        EncryptionDispatcher__constructor(&__encDisObject__);
     }
     int httpStatus = 500;
     httpStatus = __encDisObject__.pf__initializeServerKey(approach);
@@ -100,7 +100,7 @@ int ___initializeServerKey(unsigned char* approach) {
  */
 int ___setProjectPath(unsigned char* approach, unsigned char* projectPath) {
     if(__encDisObject__.isInitialized != 1) {
-        EncodeDispatcher__constructor(&__encDisObject__);
+        EncryptionDispatcher__constructor(&__encDisObject__);
     }
 
     int httpStatus = 500;

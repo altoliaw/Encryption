@@ -178,7 +178,7 @@ static int FileGeneration_setProjectPath(FileGeneration* oFG, unsigned char* pro
         memcpy(oFG->currentWorkingDirectory, projectPath, length);
         oFG->currentWorkingDirectory[length] = (unsigned char)'\0';
     }
-    printf("FileGeneration_setProjectPath | Set project path: %s\n", oFG->currentWorkingDirectory);
+    fprintf(stderr, "FileGeneration_setProjectPath | Set project path: %s\n", oFG->currentWorkingDirectory);
     return httpStatus;
 }
 

@@ -1,9 +1,9 @@
 #include "../../Headers/Encryptions/AES_256_GCM.h"
 
-static int AES_256_GCM_encryption(Encode*, const unsigned char*, const int, unsigned char*, int*, unsigned char*);
-static int AES_256_GCM_decryption(Encode*, unsigned char*, int, unsigned char*, int*, unsigned char*);
-static int AES_256_GCM_initializeMasterKey(Encode*);
-static int AES_256_GCM_setProjectPath(Encode*, unsigned char*);
+static int AES_256_GCM_encryption(Encryption*, const unsigned char*, const int, unsigned char*, int*, unsigned char*);
+static int AES_256_GCM_decryption(Encryption*, unsigned char*, int, unsigned char*, int*, unsigned char*);
+static int AES_256_GCM_initializeMasterKey(Encryption*);
+static int AES_256_GCM_setProjectPath(Encryption*, unsigned char*);
 static int AES_256_GCM_generateMasterKey(AES_256_GCM*);
 static int AES_256_GCM_getMasterKey(AES_256_GCM*);
 static int AES_256_GCM_getIV(unsigned char*);
@@ -21,12 +21,12 @@ void AES_256_GCM__constructor(AES_256_GCM* a2gObject)
     }
 
     // Inheritance
-    Encode__extension(&(a2gObject->o_Encode));
+    Encryption__extension(&(a2gObject->o_Encryption));
     // Class methods overloading (parent class)
-    (a2gObject->o_Encode).pf__encryption = &AES_256_GCM_encryption;
-    (a2gObject->o_Encode).pf__decryption = &AES_256_GCM_decryption;
-    (a2gObject->o_Encode).pf__initializeServerKey = &AES_256_GCM_initializeMasterKey;
-    (a2gObject->o_Encode).pf__setProjectPath = &AES_256_GCM_setProjectPath;
+    (a2gObject->o_Encryption).pf__encryption = &AES_256_GCM_encryption;
+    (a2gObject->o_Encryption).pf__decryption = &AES_256_GCM_decryption;
+    (a2gObject->o_Encryption).pf__initializeServerKey = &AES_256_GCM_initializeMasterKey;
+    (a2gObject->o_Encryption).pf__setProjectPath = &AES_256_GCM_setProjectPath;
     memset(a2gObject->masterKey, (unsigned char)'\0', AES_256_GCM_KEY_SIZE);
 
     // Class methods
@@ -42,7 +42,7 @@ void AES_256_GCM__destructor(AES_256_GCM* a2gObject)
 /**
  * AES_256_GCM encryption
  *
- * @param pEnc Encode* The address of the encryption object
+ * @param pEnc Encryption* The address of the encryption object
  * @param plaintext const unsigned char* The plaintext for the encryption. The size of the array outside shall
  * preserved AES_256_GCM_IV_SIZE (12) units. That is, if the fixed size is 1024 for plaintext,
  * the size of the array outside shall be 1024+12 = 1036.
@@ -54,7 +54,7 @@ void AES_256_GCM__destructor(AES_256_GCM* a2gObject)
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
 static int AES_256_GCM_encryption(
-    Encode* pEnc,
+    Encryption* pEnc,
     const unsigned char* plaintext,
     const int plaintextLen,
     unsigned char* ciphertext,
@@ -155,7 +155,7 @@ static int AES_256_GCM_encryption(
 /**
  * AES_256_GCM decryption
  *
- * @param pEnc Encode* The address of the encryption object
+ * @param pEnc Encryption* The address of the encryption object
  * @param ciphertext const unsigned char* The ciphertext
  * @param ciphertextLen const int The length of the ciphertext string
  * @param plaintext unsigned char* The plaintext for the encryption
@@ -165,7 +165,7 @@ static int AES_256_GCM_encryption(
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
 static int AES_256_GCM_decryption(
-    Encode* pEnc,
+    Encryption* pEnc,
     unsigned char* ciphertext,
     int ciphertextLen,
     unsigned char* plaintext,
@@ -345,10 +345,10 @@ static int AES_256_GCM_checkFileExisted(AES_256_GCM* a2gObject)
 static int AES_256_GCM_readKeyFile(AES_256_GCM* a2gObject)
 {
     int httpStatus = 500;
-    //printf("AES_256_GCM_readKeyFile\n");
     if (AES_256_GCM_checkFileExisted(a2gObject) == 200) {
         (a2gObject->fileGeneration).pf__readFile(&(a2gObject->fileGeneration), (unsigned char*)AES_256_GCM_KEY_LOCATION, a2gObject->masterKey, (unsigned char*)"rb", 1, AES_256_GCM_KEY_SIZE);
     } else {
+        fprintf(stderr, "AES_256_GCM_readKeyFile\n");
         httpStatus = 500;
     }
 
@@ -358,17 +358,18 @@ static int AES_256_GCM_readKeyFile(AES_256_GCM* a2gObject)
 /**
  * Initialization of the key file in the installation process.
  *
- * @param pEnc Encode* The address of the encryption object
+ * @param pEnc Encryption* The address of the encryption object
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
-static int AES_256_GCM_initializeMasterKey(Encode* pEnc)
+static int AES_256_GCM_initializeMasterKey(Encryption* pEnc)
 {
     AES_256_GCM* a2gObject = NULL;
     a2gObject = (AES_256_GCM*)pEnc;
     int httpStatus = 500;
 
     if (AES_256_GCM_checkDirArchitecture(a2gObject) != 200) {
+        fprintf(stderr, "AES_256_GCM_checkDirArchitecture\n");
         return httpStatus;
     }
 
@@ -384,12 +385,12 @@ static int AES_256_GCM_initializeMasterKey(Encode* pEnc)
 /**
  * Setting the project path
  *
- * @param pEnc Encode* The address of the encryption object
+ * @param pEnc Encryption* The address of the encryption object
  * @param projectPath unsigned char* The project path
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
-static int AES_256_GCM_setProjectPath(Encode* pEnc, unsigned char* projectPath)
+static int AES_256_GCM_setProjectPath(Encryption* pEnc, unsigned char* projectPath)
 {
     AES_256_GCM* a2gObject = NULL;
     a2gObject = (AES_256_GCM*)pEnc;
@@ -422,6 +423,9 @@ static int AES_256_GCM_checkDirArchitecture(AES_256_GCM* a2gObject)
 {
     int httpStatus = 500;
 
-    httpStatus = (a2gObject->fileGeneration).pf__checkDirArchitecture(&(a2gObject->fileGeneration), (unsigned char*)AES_256_GCM_KEY_LOCATION);
+    httpStatus = (a2gObject->fileGeneration).pf__checkDirArchitecture(
+        &(a2gObject->fileGeneration),
+        (unsigned char*)AES_256_GCM_KEY_LOCATION
+    );
     return httpStatus;
 }
