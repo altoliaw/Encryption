@@ -28,12 +28,12 @@
       "-fmessage-length=0",
       "-pthread",
       "-o",
-      "/home/nick/Workspace/C/Encryption/Sources/Encryptions/EncodeDispatcher.o",
-      "/home/nick/Workspace/C/Encryption/Sources/Encryptions/EncodeDispatcher.c"
+      "/home/nick/Workspace/C/Encryption/Entry.o",
+      "/home/nick/Workspace/C/Encryption/Entry.c"
     ],
     "directory": "/home/nick/Workspace/C/Encryption",
-    "file": "/home/nick/Workspace/C/Encryption/Sources/Encryptions/EncodeDispatcher.c",
-    "output": "/home/nick/Workspace/C/Encryption/Sources/Encryptions/EncodeDispatcher.o"
+    "file": "/home/nick/Workspace/C/Encryption/Entry.c",
+    "output": "/home/nick/Workspace/C/Encryption/Entry.o"
   },
   {
     "arguments": [
@@ -46,12 +46,30 @@
       "-fmessage-length=0",
       "-pthread",
       "-o",
-      "/home/nick/Workspace/C/Encryption/Sources/Encryptions/Encode.o",
-      "/home/nick/Workspace/C/Encryption/Sources/Encryptions/Encode.c"
+      "/home/nick/Workspace/C/Encryption/Sources/Encryptions/EncryptionDispatcher.o",
+      "/home/nick/Workspace/C/Encryption/Sources/Encryptions/EncryptionDispatcher.c"
     ],
     "directory": "/home/nick/Workspace/C/Encryption",
-    "file": "/home/nick/Workspace/C/Encryption/Sources/Encryptions/Encode.c",
-    "output": "/home/nick/Workspace/C/Encryption/Sources/Encryptions/Encode.o"
+    "file": "/home/nick/Workspace/C/Encryption/Sources/Encryptions/EncryptionDispatcher.c",
+    "output": "/home/nick/Workspace/C/Encryption/Sources/Encryptions/EncryptionDispatcher.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-std=c99",
+      "-O3",
+      "-g3",
+      "-Wall",
+      "-c",
+      "-fmessage-length=0",
+      "-pthread",
+      "-o",
+      "/home/nick/Workspace/C/Encryption/Sources/Encryptions/Encryption.o",
+      "/home/nick/Workspace/C/Encryption/Sources/Encryptions/Encryption.c"
+    ],
+    "directory": "/home/nick/Workspace/C/Encryption",
+    "file": "/home/nick/Workspace/C/Encryption/Sources/Encryptions/Encryption.c",
+    "output": "/home/nick/Workspace/C/Encryption/Sources/Encryptions/Encryption.o"
   },
   {
     "arguments": [
@@ -88,5 +106,59 @@
     "directory": "/home/nick/Workspace/C/Encryption",
     "file": "/home/nick/Workspace/C/Encryption/Sources/FileGenerations/FileGeneration.c",
     "output": "/home/nick/Workspace/C/Encryption/Sources/FileGenerations/FileGeneration.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-std=c99",
+      "-O3",
+      "-g3",
+      "-Wall",
+      "-c",
+      "-fmessage-length=0",
+      "-pthread",
+      "-o",
+      "/home/nick/Workspace/C/Encryption/Sources/Encoders/Encoder.o",
+      "/home/nick/Workspace/C/Encryption/Sources/Encoders/Encoder.c"
+    ],
+    "directory": "/home/nick/Workspace/C/Encryption",
+    "file": "/home/nick/Workspace/C/Encryption/Sources/Encoders/Encoder.c",
+    "output": "/home/nick/Workspace/C/Encryption/Sources/Encoders/Encoder.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-std=c99",
+      "-O3",
+      "-g3",
+      "-Wall",
+      "-c",
+      "-fmessage-length=0",
+      "-pthread",
+      "-o",
+      "/home/nick/Workspace/C/Encryption/Sources/Encoders/EncoderDispatcher.o",
+      "/home/nick/Workspace/C/Encryption/Sources/Encoders/EncoderDispatcher.c"
+    ],
+    "directory": "/home/nick/Workspace/C/Encryption",
+    "file": "/home/nick/Workspace/C/Encryption/Sources/Encoders/EncoderDispatcher.c",
+    "output": "/home/nick/Workspace/C/Encryption/Sources/Encoders/EncoderDispatcher.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-std=c99",
+      "-O3",
+      "-g3",
+      "-Wall",
+      "-c",
+      "-fmessage-length=0",
+      "-pthread",
+      "-o",
+      "/home/nick/Workspace/C/Encryption/Sources/Encoders/UU_Encode.o",
+      "/home/nick/Workspace/C/Encryption/Sources/Encoders/UU_Encode.c"
+    ],
+    "directory": "/home/nick/Workspace/C/Encryption",
+    "file": "/home/nick/Workspace/C/Encryption/Sources/Encoders/UU_Encode.c",
+    "output": "/home/nick/Workspace/C/Encryption/Sources/Encoders/UU_Encode.o"
   }
 ]
