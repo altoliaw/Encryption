@@ -44,8 +44,8 @@ void AES_256_GCM__destructor(const AES_256_GCM* a2gObject)
  *
  * @param pEnc Encryption* The address of the encryption object
  * @param plaintext const unsigned char* The plaintext for the encryption. The size of the array outside shall
- * preserved AES_256_GCM_IV_SIZE (12) units. That is, if the fixed size is 1024 for plaintext,
- * the size of the array outside shall be 1024+12 = 1036.
+ * preserved AES_256_GCM_IV_SIZE (12) and AES_256_GCM_TAG_SIZE(16) units. That is, if the fixed size is 1024 for the variable, plaintext,
+ * the size of the array outside shall be 1024+12+16 = 1052 for the variable, ciphertext.
  * @param plaintextLen const int The length of the plaintext string
  * @param ciphertext unsigned char* The ciphertext
  * @param ciphertextLen int* The length of the ciphertext string
@@ -136,15 +136,16 @@ static int AES_256_GCM_encryption(
         EVP_CIPHER_CTX_free(ecCtx);
         *ciphertextLen = cipherLen;
 
-        // Adding the IV value into variable, cipherText and modifying the variable, cipherTextLen
+        // Adding the IV and auth values into variable sequentially, cipherText and modifying the variable, cipherTextLen
         // Due to SonarLint's suggestions, the size of the array shall be larger than 1.
         unsigned char tmpCipher[((unsigned int)cipherLen) + 1];
         memset(tmpCipher, (unsigned char)'\0', ((unsigned int)cipherLen) + 1);
         memcpy(tmpCipher, ciphertext, cipherLen);
         memset(ciphertext, (unsigned char)'\0', cipherLen);
         memcpy(ciphertext, iv, AES_256_GCM_IV_SIZE);
-        memcpy((ciphertext + AES_256_GCM_IV_SIZE), tmpCipher, cipherLen);
-        *ciphertextLen = *ciphertextLen + AES_256_GCM_IV_SIZE;
+        memcpy((ciphertext + AES_256_GCM_IV_SIZE), authTag, AES_256_GCM_TAG_SIZE);
+        memcpy((ciphertext + AES_256_GCM_IV_SIZE + AES_256_GCM_TAG_SIZE), tmpCipher, cipherLen);
+        *ciphertextLen = *ciphertextLen + AES_256_GCM_IV_SIZE + AES_256_GCM_TAG_SIZE;
 
         return 200;
     } else {
@@ -185,18 +186,22 @@ static int AES_256_GCM_decryption(
 
     // Obtaining the IV value
     unsigned char iv[AES_256_GCM_IV_SIZE + 1];
-    memset(iv, (unsigned char)'\0', AES_256_GCM_IV_SIZE + 1);
+    memset(iv, '\0', AES_256_GCM_IV_SIZE + 1);
     memcpy(iv, ciphertext, AES_256_GCM_IV_SIZE);
+
+    // Obtaining the authTag value
+    memset(authTag, '\0', AES_256_GCM_TAG_SIZE);
+    memcpy(authTag, ciphertext + AES_256_GCM_IV_SIZE, AES_256_GCM_TAG_SIZE);
 
     // Removing the IV value from the variable, "ciphertext"
     unsigned char tmpCipher[ciphertextLen + 1];
-    memset(tmpCipher, (unsigned char)'\0', ciphertextLen + 1);
+    memset(tmpCipher, '\0', ciphertextLen + 1);
 
     // Copying and ignoring the IV value
-    memcpy(tmpCipher, (ciphertext + AES_256_GCM_IV_SIZE), (ciphertextLen - AES_256_GCM_IV_SIZE));
-    memset(ciphertext, (unsigned char)'\0', ciphertextLen);
-    memcpy(ciphertext, tmpCipher, (ciphertextLen - AES_256_GCM_IV_SIZE));
-    ciphertextLen = (ciphertextLen - AES_256_GCM_IV_SIZE);
+    memcpy(tmpCipher, (ciphertext + AES_256_GCM_IV_SIZE + AES_256_GCM_TAG_SIZE), (ciphertextLen - AES_256_GCM_IV_SIZE - AES_256_GCM_TAG_SIZE));
+    memset(ciphertext, '\0', ciphertextLen);
+    memcpy(ciphertext, tmpCipher, (ciphertextLen - AES_256_GCM_IV_SIZE - AES_256_GCM_TAG_SIZE));
+    ciphertextLen = (ciphertextLen - AES_256_GCM_IV_SIZE - AES_256_GCM_TAG_SIZE);
 
     int currentLen = 0;
     int plainLen = 0;

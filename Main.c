@@ -5,6 +5,7 @@
 */
 int main(int argc, char *argv[]) {
     int iHttpNum = 0;
+    /*
     unsigned char plainText [] = "Catagg44`\0";
     int plainTextLen = (int)strlen((char*)plainText);
     unsigned char encodedText [200];
@@ -28,16 +29,16 @@ int main(int argc, char *argv[]) {
         (unsigned char *)"UU_Encode");
     fprintf(stderr, "iHttpNum = %d\n", iHttpNum);
     fprintf(stderr, "decodedText = %s and total length = %d\n", plainText2, plainText2Len);
+    */
 
-
-
+    // ===========================
     //unsigned char* projectPath = (unsigned char*)"/home/nick/Workspace/C/Encryption";
     //iHttpNum = ___setProjectPath((unsigned char*)"AES_256_GCM", projectPath);
     //printf("http code is %d\n", iHttpNum);
     //iHttpNum = ___initializeServerKey((unsigned char*)"AES_256_GCM");
     //printf("http code is %d\n", iHttpNum);
 
-    /*
+
     int iLen = 0;
     unsigned char buffer[2060];
     unsigned char tag[16];
@@ -64,6 +65,7 @@ int main(int argc, char *argv[]) {
     printf("========================================================\n");
     unsigned char decryptedBuffer[2060];
     memset(decryptedBuffer,'\0', 2060);
+    unsigned char tag2[16];
     int iDLen = 0;
 
     iHttpNum = ___decryption(
@@ -71,7 +73,7 @@ int main(int argc, char *argv[]) {
         iLen,
         decryptedBuffer,
         &iDLen,
-        tag,
+        tag2,
         (unsigned char* )"AES_256_GCM"
     );
 
@@ -80,6 +82,6 @@ int main(int argc, char *argv[]) {
         printf("The plaintext is %s\n", decryptedBuffer);
         printf("The length of the plainText %d\n", iDLen);
     }
-    */
+
     return 0;
 }
