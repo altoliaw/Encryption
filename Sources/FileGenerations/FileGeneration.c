@@ -11,7 +11,6 @@ static int FileGeneration_checkDirArchitecture(FileGeneration*, unsigned char*);
 // Method definitions
 void FileGeneration__constructor(FileGeneration* oFG)
 {
-    //printf("FileGeneration__constructor\n");
     oFG->isInitialized = 1;
     oFG->pf__checkFileExisted = &FileGeneration_checkFileExisted;
     oFG->pf__setProjectPath = &FileGeneration_setProjectPath;

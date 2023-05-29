@@ -259,6 +259,7 @@ static int AES_256_GCM_decryption(
     if (decryptedStatus > 0) {
         return 200;
     } else {
+        fprintf(stderr, "decryptedStatus error\n");
         return 500;
     }
 }

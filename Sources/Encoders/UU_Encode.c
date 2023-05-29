@@ -62,7 +62,7 @@ int UU_Encode_encoder(Encoder* oEncoder,
         for (int j = 0; j < DECIMAL_BIT_STEP; j++) {
             int index = (endElementIndex - j) % (2 * DECIMAL_BIT_STEP);
             int rightMostBit = decimal & 1;
-            inputBitBuffer[index] = '0' + rightMostBit;// The bit
+            inputBitBuffer[index] = (unsigned char)('0' + rightMostBit);// The bit
             decimal = decimal >> 1; // Right shift a bit
         }
         remainder += DECIMAL_BIT_STEP;// The remainder is equal to the elements which are pushed.
@@ -127,7 +127,7 @@ int UU_Encode_encoder(Encoder* oEncoder,
  * @param plainTextLen int* The length of the plainText; the variable belongs to called-by the value of the address
  * @return
  */
-int UU_Encode_decoder(Encoder* oEncoder,
+static int UU_Encode_decoder(Encoder* oEncoder,
     unsigned char* encodedText, int encodedLen, unsigned char* plainText, int* plainTextLen)
 {
     // Setting the starting encoding position and recalculating the length of the encoded text
@@ -138,7 +138,7 @@ int UU_Encode_decoder(Encoder* oEncoder,
         return 500;
     }
     unsigned char numStr[10];
-    int numLength = pipePos - (char*)encodedText;
+    int numLength = (int)(pipePos - (char*)encodedText);
     memcpy(numStr, encodedText, numLength);
     numStr[numLength] = (unsigned char)'\0';
 
@@ -177,7 +177,7 @@ int UU_Encode_decoder(Encoder* oEncoder,
         for (int j = 0; j < UU_BIT_STEP; j++) {
             int index = (endElementIndex - j) % (2 * UU_BIT_STEP);
             int rightMostBit = decimal & 1;
-            inputBitBuffer[index] = '0' + rightMostBit;
+            inputBitBuffer[index] = (unsigned char)('0' + rightMostBit);
             decimal = decimal >> 1; // Shifting a right bit
         }
         remainder += UU_BIT_STEP;
