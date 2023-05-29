@@ -45,7 +45,10 @@ ${Prdir}/${PjN}/build : 	${Prdir}/Entry.o \
 							${Sources}/Encryptions/EncryptionDispatcher.o \
 							${Sources}/Encryptions/Encryption.o \
 							${Sources}/Encryptions/AES_256_GCM.o \
-							${Sources}/FileGenerations/FileGeneration.o
+							${Sources}/FileGenerations/FileGeneration.o \
+							${Sources}/Encoders/EncoderDispatcher.o \
+							${Sources}/Encoders/Encoder.o \
+							${Sources}/Encoders/UU_Encode.o
 
 # Create a module
 ${Prdir}/${PjN}: 	${Prdir}/Main.o \
@@ -53,7 +56,10 @@ ${Prdir}/${PjN}: 	${Prdir}/Main.o \
 					${Sources}/Encryptions/EncryptionDispatcher.o \
 					${Sources}/Encryptions/Encryption.o \
 					${Sources}/Encryptions/AES_256_GCM.o \
-					${Sources}/FileGenerations/FileGeneration.o
+					${Sources}/FileGenerations/FileGeneration.o \
+					${Sources}/Encoders/EncoderDispatcher.o \
+					${Sources}/Encoders/Encoder.o \
+					${Sources}/Encoders/UU_Encode.o
 
 	${Cmp} ${Stdlib} ${Cmpopt} ${Detinfo} ${Wall} ${Fsg} -o ${Prdir}/${PjN} ${Prdir}/Main.o \
 	${Prdir}/Entry.o \
@@ -61,6 +67,9 @@ ${Prdir}/${PjN}: 	${Prdir}/Main.o \
 	${Sources}/Encryptions/Encryption.o \
 	${Sources}/Encryptions/AES_256_GCM.o \
 	${Sources}/FileGenerations/FileGeneration.o \
+	${Sources}/Encoders/EncoderDispatcher.o \
+	${Sources}/Encoders/Encoder.o \
+	${Sources}/Encoders/UU_Encode.o \
 	-lssl -lcrypto
 
 # Main
@@ -86,3 +95,15 @@ ${Sources}/Encryptions/AES_256_GCM.o:	${Headers}/FileGenerations/FileGeneration.
 # FileGeneration
 ${Sources}/FileGenerations/FileGeneration.o:	${Headers}/FileGenerations/FileGeneration.h ${Sources}/FileGenerations/FileGeneration.c
 	${Cmp} ${Stdlib} ${Cmpopt} ${Detinfo} ${Wall} ${Sources}/FileGenerations/FileGeneration.c -c ${Fsg} -o ${Sources}/FileGenerations/FileGeneration.o ${OpenSSL3}
+
+# EnoderDispatcher
+${Sources}/Encoders/EncoderDispatcher.o:	${Headers}/Encoders/EncoderDispatcher.h ${Headers}/Encoders/Encoder.h ${Headers}/Encoders/UU_Encode.h ${Sources}/Encoders/EncoderDispatcher.c
+	${Cmp} ${Stdlib} ${Cmpopt} ${Detinfo} ${Wall} ${Sources}/Encoders/EncoderDispatcher.c -c ${Fsg} -o ${Sources}/Encoders/EncoderDispatcher.o ${OpenSSL3}
+
+# Encoder
+${Sources}/Encoders/Encoder.o:	${Headers}/Encoders/Encoder.h ${Headers}/Encoders/Encoder.h ${Headers}/Encoders/UU_Encode.h ${Sources}/Encoders/Encoder.c
+	${Cmp} ${Stdlib} ${Cmpopt} ${Detinfo} ${Wall} ${Sources}/Encoders/Encoder.c -c ${Fsg} -o ${Sources}/Encoders/Encoder.o ${OpenSSL3}
+
+# UU_Encode
+${Sources}/Encoders/UU_Encode.o:	${Headers}/Encoders/UU_Encode.h ${Headers}/Encoders/Encoder.h ${Sources}/Encoders/UU_Encode.c
+	${Cmp} ${Stdlib} ${Cmpopt} ${Detinfo} ${Wall} ${Sources}/Encoders/UU_Encode.c -c ${Fsg} -o ${Sources}/Encoders/UU_Encode.o ${OpenSSL3}

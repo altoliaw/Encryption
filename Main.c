@@ -1,4 +1,3 @@
-//#include "./Headers/Header.h"
 #include "./Headers/Entry.h"
 
 /**
@@ -6,13 +5,39 @@
 */
 int main(int argc, char *argv[]) {
     int iHttpNum = 0;
-    unsigned char* projectPath = (unsigned char*)"/home/nick/Workspace/C/Encryption";
-    iHttpNum = ___setProjectPath((unsigned char*)"AES_256_GCM", projectPath);
+    unsigned char plainText [] = "Catagg44`\0";
+    int plainTextLen = (int)strlen((char*)plainText);
+    unsigned char encodedText [200];
+    int encodedTextLen = 0;
+
+    iHttpNum = ___encoder(plainText,
+        plainTextLen,
+        encodedText,
+        &encodedTextLen,
+        (unsigned char *)"UU_Encode");
+    fprintf(stderr, "iHttpNum = %d\n", iHttpNum);
+    fprintf(stderr, "encodedText = %s and total length = %d\n", encodedText, encodedTextLen);
+    //==========================
+    unsigned char plainText2 [200];
+    int plainText2Len = 0;
+    int encodedTextLen2 = (int)strlen((char*)encodedText);
+    iHttpNum = ___decoder(encodedText,
+        encodedTextLen2,
+        plainText2,
+        &plainText2Len,
+        (unsigned char *)"UU_Encode");
+    fprintf(stderr, "iHttpNum = %d\n", iHttpNum);
+    fprintf(stderr, "decodedText = %s and total length = %d\n", plainText2, plainText2Len);
+
+
+
+    //unsigned char* projectPath = (unsigned char*)"/home/nick/Workspace/C/Encryption";
+    //iHttpNum = ___setProjectPath((unsigned char*)"AES_256_GCM", projectPath);
     //printf("http code is %d\n", iHttpNum);
     //iHttpNum = ___initializeServerKey((unsigned char*)"AES_256_GCM");
     //printf("http code is %d\n", iHttpNum);
 
-
+    /*
     int iLen = 0;
     unsigned char buffer[2060];
     unsigned char tag[16];
@@ -55,6 +80,6 @@ int main(int argc, char *argv[]) {
         printf("The plaintext is %s\n", decryptedBuffer);
         printf("The length of the plainText %d\n", iDLen);
     }
-
+    */
     return 0;
 }

@@ -34,7 +34,7 @@ void AES_256_GCM__constructor(AES_256_GCM* a2gObject)
     AES_256_GCM_getMasterKey(a2gObject);
 }
 
-void AES_256_GCM__destructor(AES_256_GCM* a2gObject)
+void AES_256_GCM__destructor(const AES_256_GCM* a2gObject)
 {
     FileGeneration__destructor(&(a2gObject->fileGeneration));
 }

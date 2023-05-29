@@ -40,7 +40,7 @@ struct AES_256_GCM {
 
 // Method declarations
 void AES_256_GCM__constructor(AES_256_GCM*);
-void AES_256_GCM__destructor(AES_256_GCM*);
+void AES_256_GCM__destructor(const AES_256_GCM*);
 
 // External variables & functions
 extern void Encryption__extension(const Encryption*);

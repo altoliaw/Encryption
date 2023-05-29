@@ -9,7 +9,10 @@
         "rand.h": "c",
         "evp.h": "c",
         "entry.h": "c",
-        "encryption.h": "c"
+        "encryption.h": "c",
+        "uu_encode.h": "c",
+        "encoder.h": "c",
+        "encoderdispatcher.h": "c"
     },
     "sonarlint.pathToCompileCommands": "${workspaceFolder}/.vscode/compile_commands.json",
     "C_Cpp.errorSquiggles": "disabled"
