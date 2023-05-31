@@ -414,6 +414,7 @@ static int AES_256_GCM_setProjectPath(Encryption* pEnc, unsigned char* projectPa
         );
     }
 
+    AES_256_GCM_getMasterKey(a2gObject);
     return httpStatus;
 }
 
