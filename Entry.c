@@ -3,7 +3,16 @@
 // Global variable
 static EncryptionDispatcher __encryptionDispatcherObject__;
 static EncoderDispatcher __encoderDispatcherObject__;
-
+/**
+ * AES_256_GCM encryption with UUencode
+ *
+ * @param plainText unsigned char* The plain text
+ * @param plainTextLen int The length of the plain text
+ * @param encodedText unsigned char* The encoded text; the size of the array shall be allocated in advance
+ * @param encodedTextLen int* The length of the encoded text; the variable belongs to call-by the value of address
+ * @return int HTTP response status codes, more information can be referred
+ * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+ */
 int ___AES_256_GCMWithUUEncode(
     const unsigned char* plainText,
     const int plainTextLen,
@@ -24,6 +33,16 @@ int ___AES_256_GCMWithUUEncode(
     return httpStatus;
 }
 
+/**
+ * AES_256_GCM decryption with UUdecode
+ *
+ * @param encodedText unsigned char* The encoded text; the size of the array shall be allocated in advance
+ * @param encodedTextLen int The length of the encoded text
+ * @param plainText unsigned char* The plain text; the size of the array shall be allocated in advance
+ * @param plainTextLen int* The length of the plain text; the variable belongs to call-by the value of address
+ * @return int HTTP response status codes, more information can be referred
+ * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+ */
 int ___AES_256_GCMWithUUDecode(
     const unsigned char* encodedText,
     const int encodedTextLen,
@@ -144,6 +163,17 @@ int ___setProjectPath(unsigned char* approach, unsigned char* projectPath) {
     return httpStatus;
 }
 
+/**
+ * Encoding the plaintext into the encoded text
+ *
+ * @param plainText unsigned char* The plaintext
+ * @param plainTextLen int The length of the plaintext
+ * @param encodedText unsigned char* The ciphertext which the size of the array shall be defined in advance
+ * @param encodedTextLen int* The length of the ciphertext; the variable belongs to call-by the value of address
+ * @param approach unsigned char* The approach; nowadays, only "UU_Encode" is available
+ * @return int HTTP response status codes, more information can be referred
+ * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+ */
 int ___encoder(
         unsigned char* plainText,
         int plainTextLen,
@@ -167,6 +197,17 @@ int ___encoder(
     return httpStatus;
 }
 
+/**
+ * Decoding the encoded text into the plaintext
+ *
+ * @param encodedText unsigned char* The encoded text
+ * @param encodedTextLen int The length of the encoded text
+ * @param plainText unsigned char* The plain text; the size of variable shall be defined in advance
+ * @param plainTextLen int* The length of the plain text; the variable shall be defined as call-by the value of address
+ * @param approach unsigned char* The approach; nowadays, only "UU_Encode" is available
+ * @return int HTTP response status codes, more information can be referred
+ * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+ */
 int ___decoder(
         const unsigned char* encodedText,
         int encodedTextLen,
