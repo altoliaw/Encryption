@@ -24,7 +24,7 @@
   EXPORT int ___setProjectPath(unsigned char*, unsigned char*);
   // Encode
   EXPORT int ___encoder(unsigned char*, int, unsigned char*, int*, unsigned char*);
-  EXPORT int ___decoder(unsigned char*, int, unsigned char*, int*, unsigned char*);
+  EXPORT int ___decoder(const unsigned char*, int, unsigned char*, int*, unsigned char*);
 
 #else
   // AES_256_GCM + UUEncoding
