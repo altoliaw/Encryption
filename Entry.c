@@ -4,6 +4,47 @@
 static EncryptionDispatcher __encryptionDispatcherObject__;
 static EncoderDispatcher __encoderDispatcherObject__;
 
+int ___AES_256_GCMWithUUEncode(
+    const unsigned char* plainText,
+    const int plainTextLen,
+    unsigned char* encodedText,
+    int* encodedTextLen)
+{
+    #define AES_256_GCM_IV_SIZE 12 // 96 bits
+    #define AES_256_GCM_TAG_SIZE 16 // 128 bits
+
+    int httpStatus = 200;
+    unsigned char ciphertext[plainTextLen + AES_256_GCM_IV_SIZE + AES_256_GCM_TAG_SIZE + 1];
+    int ciphertextLen = 0;
+    httpStatus = ___encryption(plainText, plainTextLen, ciphertext, &ciphertextLen, (unsigned char*)"AES_256_GCM");
+    if(httpStatus < 200 || httpStatus >= 300) {
+        return httpStatus;
+    }
+    httpStatus = ___encoder(ciphertext, ciphertextLen, encodedText, encodedTextLen, (unsigned char*)"UU_Encode");
+    return httpStatus;
+}
+
+int ___AES_256_GCMWithUUDecode(
+    const unsigned char* encodedText,
+    const int encodedTextLen,
+    unsigned char* plainText,
+    int* plainTextLen)
+{
+    #define UU_BIT_STEP 6
+    #define DECIMAL_BIT_STEP 8
+    int length = (encodedTextLen * UU_BIT_STEP / DECIMAL_BIT_STEP + 1);
+    int httpStatus = 200;
+    unsigned char ciphertext[length];
+    int ciphertextLen = 0;
+    httpStatus = ___decoder(encodedText, encodedTextLen, ciphertext, &ciphertextLen, (unsigned char*)"UU_Encode");
+
+    if(httpStatus < 200 || httpStatus >= 300) {
+        return httpStatus;
+    }
+    httpStatus = ___decryption(ciphertext, ciphertextLen, plainText, plainTextLen, (unsigned char*)"AES_256_GCM");
+    return httpStatus;
+}
+
 /**
  * An entry point of encryption for dynamical links. (.so, or .dll)
  *
@@ -115,6 +156,7 @@ int ___encoder(
     }
 
     int httpStatus = 500;
+
     httpStatus = __encoderDispatcherObject__.pf__encoder(
         plainText,
         plainTextLen,
@@ -126,7 +168,7 @@ int ___encoder(
 }
 
 int ___decoder(
-        unsigned char* encodedText,
+        const unsigned char* encodedText,
         int encodedTextLen,
         unsigned char* plainText,
         int* plainTextLen,

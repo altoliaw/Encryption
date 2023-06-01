@@ -36,7 +36,7 @@ struct UU_Encode {
 
 // Method declarations
 void UU_Encode__constructor(UU_Encode*);
-void UU_Encode__destructor(UU_Encode*);
+void UU_Encode__destructor(const UU_Encode*);
 
 // External variables & functions
 extern void Encoder__extension(const Encoder*);

@@ -14,8 +14,8 @@ typedef struct Encoder Encoder;
 
 // Class body
 struct Encoder {
-  int (*pf__encoder)(Encoder*, unsigned char*, int, unsigned char*, int*);
-  int (*pf__decoder)(Encoder*, unsigned char*, int, unsigned char*, int*);
+  int (*pf__encoder)(Encoder*, const unsigned char*, int, unsigned char*, int*);
+  int (*pf__decoder)(Encoder*, const unsigned char*, int, unsigned char*, int*);
 };
 
 // Method declarations

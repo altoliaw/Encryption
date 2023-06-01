@@ -6,6 +6,29 @@
 int main(int argc, char* argv[])
 {
     int iHttpNum = 0;
+    unsigned char plainText [] = "Catagg44`\0";
+    int plainTextLen = (int)strlen((char*)plainText);
+    unsigned char encodedText [200];
+    int encodedTextLen = 0;
+
+    iHttpNum = ___AES_256_GCMWithUUEncode(plainText,
+        plainTextLen,
+        encodedText,
+        &encodedTextLen);
+    fprintf(stderr, "iHttpNum = %d\n", iHttpNum);
+    fprintf(stderr, "encodedText = %.*s and total length = %d\n", encodedTextLen, encodedText, encodedTextLen);
+    //==========================
+    int encodedTextLen2 = (int)strlen((char*)encodedText);
+    unsigned char plainText2 [200];
+    int plainText2Len = 0;
+    iHttpNum = ___AES_256_GCMWithUUDecode(encodedText,
+        encodedTextLen2,
+        plainText2,
+        &plainText2Len);
+    fprintf(stderr, "iHttpNum = %d\n", iHttpNum);
+    fprintf(stderr, "decodedText = %s and total length = %d\n", plainText2, plainText2Len);
+
+
     /*
     unsigned char plainText [] = "Catagg44`\0";
     int plainTextLen = (int)strlen((char*)plainText);
@@ -39,6 +62,7 @@ int main(int argc, char* argv[])
     // iHttpNum = ___initializeServerKey((unsigned char*)"AES_256_GCM");
     // printf("http code is %d\n", iHttpNum);
 
+    /*
     int iLen = 0;
     unsigned char buffer[2060];
     memset(buffer, '\0', 2060);
@@ -76,6 +100,6 @@ int main(int argc, char* argv[])
         printf("The plaintext is %s\n", decryptedBuffer);
         printf("The length of the plainText %d\n", iDLen);
     }
-
+    */
     return 0;
 }

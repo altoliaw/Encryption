@@ -19,8 +19,8 @@ typedef struct EncoderDispatcher EncoderDispatcher;
 struct EncoderDispatcher {
   int isInitialized;
 
-  int (*pf__encoder)(unsigned char*, int, unsigned char*, int*, unsigned char*);
-  int (*pf__decoder)(unsigned char*, int, unsigned char*, int*, unsigned char*);
+  int (*pf__encoder)(const unsigned char*, int, unsigned char*, int*, unsigned char*);
+  int (*pf__decoder)(const unsigned char*, int, unsigned char*, int*, unsigned char*);
 };
 
 // Method definitions

@@ -1,10 +1,10 @@
 #include "../../Headers/Encoders/EncoderDispatcher.h"
 
 // Method definitions
-static int EncoderDispatcher_encoder(unsigned char*, int, unsigned char*, int*, unsigned char*);
-static int (*EncoderDispatcher_encodedDispatcher(unsigned char*, Encoder*))(Encoder*, unsigned char*, int, unsigned char*, int*);
-static int EncoderDispatcher_decoder(unsigned char*, int, unsigned char*, int*, unsigned char*);
-static int (*EncoderDispatcher_decodedDispatcher(unsigned char*, Encoder*))(Encoder*, unsigned char*, int, unsigned char*, int*);
+static int EncoderDispatcher_encoder(const unsigned char*, int, unsigned char*, int*, unsigned char*);
+static int (*EncoderDispatcher_encodedDispatcher(unsigned char*, Encoder*))(Encoder*, const unsigned char*, int, unsigned char*, int*);
+static int EncoderDispatcher_decoder(const unsigned char*, int, unsigned char*, int*, unsigned char*);
+static int (*EncoderDispatcher_decodedDispatcher(unsigned char*, Encoder*))(Encoder*, const unsigned char*, int, unsigned char*, int*);
 static Encoder* EncoderDispatcher_createEncodedObject(unsigned char*);
 
 void EncoderDispatcher__constructor(EncoderDispatcher* encoderDispatcher)
@@ -35,7 +35,7 @@ void EncoderDispatcher__destructor(const EncoderDispatcher*)
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
 static int EncoderDispatcher_encoder(
-    unsigned char* plainText,
+    const unsigned char* plainText,
     int plainTextLen,
     unsigned char* encodedText,
     int* encodedTextLen,
@@ -46,7 +46,7 @@ static int EncoderDispatcher_encoder(
     pEnc = EncoderDispatcher_createEncodedObject(approach);
 
     // Definition of function variable & execution of the function
-    int (*dispatcher)(Encoder*, unsigned char*, int, unsigned char*, int*);
+    int (*dispatcher)(Encoder*, const unsigned char*, int, unsigned char*, int*);
     dispatcher = EncoderDispatcher_encodedDispatcher(approach, pEnc);
     httpStatus = dispatcher(pEnc, plainText, plainTextLen, encodedText, encodedTextLen);
     return httpStatus;
@@ -66,7 +66,7 @@ static int EncoderDispatcher_encoder(
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
 static int (*EncoderDispatcher_encodedDispatcher(unsigned char* approach, Encoder* pEnc))(Encoder* pEnc,
-    unsigned char* plainText,
+    const unsigned char* plainText,
     int plainTextLen,
     unsigned char* cipherText,
     int* cipherTextLen)
@@ -93,7 +93,7 @@ static int (*EncoderDispatcher_encodedDispatcher(unsigned char* approach, Encode
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
 static int EncoderDispatcher_decoder(
-    unsigned char* encodedText,
+    const unsigned char* encodedText,
     int encodedTextLen,
     unsigned char* plainText,
     int* plainTextLen,
@@ -105,7 +105,7 @@ static int EncoderDispatcher_decoder(
     pEnc = EncoderDispatcher_createEncodedObject(approach);
 
     // Definition of function variable & execution of the function
-    int (*dispatcher)(Encoder*, unsigned char*, int, unsigned char*, int*);
+    int (*dispatcher)(Encoder*, const unsigned char*, int, unsigned char*, int*);
     dispatcher = EncoderDispatcher_decodedDispatcher(approach, pEnc);
     httpStatus = dispatcher(pEnc, encodedText, encodedTextLen, plainText, plainTextLen);
     return httpStatus;
@@ -125,7 +125,7 @@ static int EncoderDispatcher_decoder(
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
 static int (*EncoderDispatcher_decodedDispatcher(unsigned char* approach, Encoder* pEnc))(Encoder* pEnc,
-    unsigned char* cipherText,
+    const unsigned char* cipherText,
     int cipherTextLen,
     unsigned char* plainText,
     int* plainTextLen)

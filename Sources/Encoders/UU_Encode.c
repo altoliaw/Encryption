@@ -1,7 +1,7 @@
 #include "../../Headers/Encoders/UU_Encode.h"
 
-static int UU_Encode_encoder(Encoder*, unsigned char*, int, unsigned char*, int*);
-static int UU_Encode_decoder(Encoder*, unsigned char*, int, unsigned char*, int*);
+static int UU_Encode_encoder(Encoder*, const unsigned char*, int, unsigned char*, int*);
+static int UU_Encode_decoder(Encoder*, const unsigned char*, int, unsigned char*, int*);
 
 // Method definitions
 void UU_Encode__constructor(UU_Encode* oUuEncoder)
@@ -12,7 +12,7 @@ void UU_Encode__constructor(UU_Encode* oUuEncoder)
     (oUuEncoder->oEncoder).pf__encoder = &UU_Encode_encoder;
     (oUuEncoder->oEncoder).pf__decoder = &UU_Encode_decoder;
 }
-void UU_Encode__destructor(UU_Encode*)
+void UU_Encode__destructor(const UU_Encode*)
 {
     // TODO
 }
@@ -25,15 +25,14 @@ void UU_Encode__destructor(UU_Encode*)
  * shall be defined on the caller.
  * @param plainLen int The length of The plain text of encoder
  * @param encodedText unsigned char* The encoded text of encoder; the size of variable
- * shall be defined on the caller; in addition, the format of the result of the variable is
- * "{$number}|${encoded text}"
+ * shall be defined on the caller
  * @param encodedTextLen int The length of The encoded text of encoder; the variable belongs to
  * called-by-value of address
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
 int UU_Encode_encoder(Encoder* oEncoder,
-    unsigned char* plainText, int plainLen, unsigned char* encodedText, int* encodedTextLen)
+    const unsigned char* plainText, int plainLen, unsigned char* encodedText, int* encodedTextLen)
 {
     /*
      * Reserving a character size (8 bit) in advance,
@@ -94,27 +93,6 @@ int UU_Encode_encoder(Encoder* oEncoder,
         encodedText[transIndex++] = (lastElement == 0) ? (unsigned char)(char)96 : (unsigned char)(char)(lastElement + 32);
     }
     encodedText[transIndex] = '\0';
-
-    /**
-     * To organize the encoded text as the following format "{$number}|${encoded text}",
-     * the following codes shall be prepared.
-     */
-    int finalLength = *encodedTextLen;
-    // The total length of the integer is 10 at most.
-    unsigned char numStr[10];
-    // int -> string
-    sprintf((char*)numStr, "%d", finalLength);
-    int numLength = (int)strlen((char*)numStr);
-
-    // Making a copy of the encoded text
-    char* tmp = malloc(sizeof(unsigned char) * finalLength + sizeof(unsigned char) * numLength + sizeof(char));
-    memcpy(tmp, numStr, numLength);
-    tmp[numLength] = (unsigned char)'|';
-    memcpy(tmp + numLength + 1, encodedText, finalLength);
-    memcpy(encodedText, tmp, finalLength + numLength + 1);
-    encodedText[finalLength + numLength + 1] = (unsigned char)'\0';
-    *encodedTextLen += (numLength + 1);
-    free(tmp);
     return 200;
 }
 
@@ -122,33 +100,16 @@ int UU_Encode_encoder(Encoder* oEncoder,
  * UUencoded decoder
  *
  * @param oEncoder Encoder* The encoder object
- * @param encodedText unsigned char* The encoded text; the format of the variable is "{$number}|${encoded text}"
+ * @param encodedText unsigned char* The encoded text
  * @param encodedLen int The length of the variable of the encodedText
  * @param plainText unsigned char* The plain text
  * @param plainTextLen int* The length of the plainText; the variable belongs to called-by the value of the address
  * @return
  */
 static int UU_Encode_decoder(Encoder* oEncoder,
-    unsigned char* encodedText, int encodedLen, unsigned char* plainText, int* plainTextLen)
+    const unsigned char* encodedText, int encodedLen, unsigned char* plainText, int* plainTextLen)
 {
-    // Setting the starting encoding position and recalculating the length of the encoded text
-    const char* pipePos = strchr((char*)encodedText, '|');
-    if (pipePos == NULL) {
-        fprintf(stderr, "The pipe symbol does not exist.\n");
-        return 500;
-    }
-    unsigned char numStr[10];
-    int numLength = (int)(pipePos - (char*)encodedText);
-    memcpy(numStr, encodedText, numLength);
-    numStr[numLength] = (unsigned char)'\0';
-
-    int encodedLength = atoi((char*)numStr);
-    const unsigned char* encodedStart = encodedText + numLength + 1;
-
-    if (encodedLength != (encodedLen -= (numLength + 1))) {
-        fprintf(stderr, "The length are not equal to the integer of the first char%d, %d\n", encodedLength, encodedLen);
-        return 500;
-    }
+    const unsigned char* encodedStart = encodedText;
     /*
      * Reserving a character size (6 bit) in advance,
      * and the buffer is modeled as a cyclic storage
