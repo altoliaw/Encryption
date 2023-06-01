@@ -19,8 +19,8 @@ struct EncryptionDispatcher {
   int isInitialized;
 
   // Public variables to constructor/destructor functions
-  int (*pf__encryption)(const unsigned char*, const int, unsigned char*, int*, unsigned char*, unsigned char*);
-  int (*pf__decryption)(unsigned char*, int, unsigned char*, int*, unsigned char*, unsigned char*);
+  int (*pf__encryption)(const unsigned char*, const int, unsigned char*, int*, unsigned char*);
+  int (*pf__decryption)(unsigned char*, int, unsigned char*, int*, unsigned char*);
   int (*pf__initializeServerKey)(unsigned char*);
   int (*pf__setProjectPath)(unsigned char*, unsigned char*);
 };

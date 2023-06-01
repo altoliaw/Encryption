@@ -1,11 +1,11 @@
 #include "../../Headers/Encryptions/EncryptionDispatcher.h"
 
-static int EncryptionDispatcher_encryption(const unsigned char*, const int, unsigned char*, int*, unsigned char*, unsigned char*);
-static int EncryptionDispatcher_decryption(unsigned char*, int, unsigned char*, int*, unsigned char*, unsigned char*);
+static int EncryptionDispatcher_encryption(const unsigned char*, const int, unsigned char*, int*, unsigned char*);
+static int EncryptionDispatcher_decryption(unsigned char*, int, unsigned char*, int*, unsigned char*);
 static int EncryptionDispatcher_initializeServerKey(unsigned char*);
 static int EncryptionDispatcher_setProjectPath(unsigned char*, unsigned char*);
-static int (*EncryptionDispatcher_encryptedDispatcher(unsigned char*, Encryption*))(Encryption*, const unsigned char*, const int, unsigned char*, int*, unsigned char*);
-static int (*EncryptionDispatcher_decryptedDispatcher(unsigned char*, Encryption*))(Encryption*, unsigned char*, int, unsigned char*, int*, unsigned char*);
+static int (*EncryptionDispatcher_encryptedDispatcher(unsigned char*, Encryption*))(Encryption*, const unsigned char*, const int, unsigned char*, int*);
+static int (*EncryptionDispatcher_decryptedDispatcher(unsigned char*, Encryption*))(Encryption*, unsigned char*, int, unsigned char*, int*);
 static int (*EncryptionDispatcher_initializeServerKeyDispatcher(unsigned char*, Encryption*))(Encryption*);
 static int (*EncryptionDispatcher_setProjectPathDispatcher(unsigned char* approach, Encryption* pEnc))(Encryption* pEnc, unsigned char* projectPath);
 static Encryption* EncryptionDispatcher_createEncryptedObject(unsigned char*);
@@ -31,7 +31,6 @@ void EncryptionDispatcher__destructor(const EncryptionDispatcher*)
  * @param plaintextLen const int The length of the source string
  * @param ciphertext unsigned char* The ciphertext
  * @param ciphertextLen int* The length of the ciphertext string
- * @param authTag unsigned char* The authentication tag
  * @param approach unsigned char* The approaches for encryption;
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
@@ -41,7 +40,6 @@ static int EncryptionDispatcher_encryption(
     const int plaintextLen,
     unsigned char* ciphertext,
     int* ciphertextLen,
-    unsigned char* authTag,
     unsigned char* approach)
 {
 
@@ -49,9 +47,9 @@ static int EncryptionDispatcher_encryption(
     pEnc = EncryptionDispatcher_createEncryptedObject(approach);
 
     // Definition of function variable & execution of the function
-    int (*dispatcher)(Encryption*, const unsigned char*, const int, unsigned char*, int*, unsigned char*);
+    int (*dispatcher)(Encryption*, const unsigned char*, const int, unsigned char*, int*);
     dispatcher = EncryptionDispatcher_encryptedDispatcher(approach, pEnc);
-    int httpStatus = dispatcher(pEnc, plaintext, plaintextLen, ciphertext, ciphertextLen, authTag);
+    int httpStatus = dispatcher(pEnc, plaintext, plaintextLen, ciphertext, ciphertextLen);
 
     return httpStatus;
 }
@@ -63,7 +61,6 @@ static int EncryptionDispatcher_encryption(
  * @param ciphertextLen const int The length of the ciphertext string
  * @param plaintext unsigned char* The plaintext
  * @param plaintextLen int* The length of the plaintext
- * @param authTag unsigned char* The authentication tag
  * @param approach unsigned char* The approaches for decryption; nowadays,
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
@@ -73,7 +70,6 @@ static int EncryptionDispatcher_decryption(
     int ciphertextLen,
     unsigned char* plaintext,
     int* plaintextLen,
-    unsigned char* authTag,
     unsigned char* approach)
 {
 
@@ -81,9 +77,9 @@ static int EncryptionDispatcher_decryption(
     pEnc = EncryptionDispatcher_createEncryptedObject(approach);
 
     // Definition of function variable & execution of the function
-    int (*dispatcher)(Encryption*, unsigned char*, int, unsigned char*, int*, unsigned char*);
+    int (*dispatcher)(Encryption*, unsigned char*, int, unsigned char*, int*);
     dispatcher = EncryptionDispatcher_decryptedDispatcher(approach, pEnc);
-    int httpStatus = dispatcher(pEnc, ciphertext, ciphertextLen, plaintext, plaintextLen, authTag);
+    int httpStatus = dispatcher(pEnc, ciphertext, ciphertextLen, plaintext, plaintextLen);
 
     return httpStatus;
 }
@@ -129,7 +125,6 @@ static int EncryptionDispatcher_setProjectPath(unsigned char* approach, unsigned
     return httpStatus;
 }
 
-
 /**
  * Encryption Dispatcher
  *
@@ -140,7 +135,6 @@ static int EncryptionDispatcher_setProjectPath(unsigned char* approach, unsigned
  * @param plaintextLen const int The length of the source string
  * @param ciphertext unsigned char* The plaintext target
  * @param ciphertextLen int* The length of the target string; nowadays
- * @param authTag unsigned char* The authentication tag
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
@@ -148,8 +142,7 @@ static int (*EncryptionDispatcher_encryptedDispatcher(unsigned char* approach, E
     const unsigned char* plaintext,
     const int plaintextLen,
     unsigned char* ciphertext,
-    int* ciphertextLen,
-    unsigned char* authTag)
+    int* ciphertextLen)
 {
 
     if (!strcmp((char*)approach, "AES_256_GCM")) {
@@ -170,7 +163,6 @@ static int (*EncryptionDispatcher_encryptedDispatcher(unsigned char* approach, E
  * @param ciphertextLen const int The length of the source string
  * @param plaintext unsigned char* The plaintext target
  * @param plaintextLen int* The length of the target string; nowadays
- * @param authTag unsigned char* The authentication tag
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
@@ -179,8 +171,7 @@ static int (*EncryptionDispatcher_decryptedDispatcher(unsigned char* approach, E
     unsigned char* ciphertext,
     int ciphertextLen,
     unsigned char* plaintext,
-    int* plaintextLen,
-    unsigned char* authTag)
+    int* plaintextLen)
 {
 
     if (!strcmp((char*)approach, "AES_256_GCM")) {
@@ -249,7 +240,7 @@ static Encryption* EncryptionDispatcher_createEncryptedObject(unsigned char* app
     Encryption* pObject = NULL;
     if (!strcmp((char*)approach, "AES_256_GCM")) {
         static AES_256_GCM __a2gObject;
-        if(__a2gObject.isInitialized != 1) {
+        if (__a2gObject.isInitialized != 1) {
             AES_256_GCM__constructor(&__a2gObject);
         }
         pObject = (Encryption*)(&__a2gObject);

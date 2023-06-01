@@ -4,15 +4,16 @@ static int UU_Encode_encoder(Encoder*, unsigned char*, int, unsigned char*, int*
 static int UU_Encode_decoder(Encoder*, unsigned char*, int, unsigned char*, int*);
 
 // Method definitions
-void UU_Encode__constructor(UU_Encode* oUuEncoder) {
+void UU_Encode__constructor(UU_Encode* oUuEncoder)
+{
     oUuEncoder->isInitialized = 1;
 
     Encoder__extension(&(oUuEncoder->oEncoder));
     (oUuEncoder->oEncoder).pf__encoder = &UU_Encode_encoder;
     (oUuEncoder->oEncoder).pf__decoder = &UU_Encode_decoder;
-
 }
-void UU_Encode__destructor(UU_Encode*) {
+void UU_Encode__destructor(UU_Encode*)
+{
     // TODO
 }
 
@@ -40,16 +41,16 @@ int UU_Encode_encoder(Encoder* oEncoder,
      * as a result, the size of the inputBitBuffer equals to 2 * DECIMAL_BIT_STEP
      */
     unsigned char inputBitBuffer[(DECIMAL_BIT_STEP + DECIMAL_BIT_STEP)];
-    int totalBits = (plainLen * DECIMAL_BIT_STEP);// The size of the total bits of plainText
+    int totalBits = (plainLen * DECIMAL_BIT_STEP); // The size of the total bits of plainText
     // Prediction of the encoded length
     *encodedTextLen = (totalBits % UU_BIT_STEP == 0) ? (totalBits / UU_BIT_STEP) : (totalBits / UU_BIT_STEP + 1);
-    encodedText[*encodedTextLen + 1] = (unsigned char)'\0';// The size is equal to `*encodedTextLen + 1` because the last element is for the '\0'.
+    encodedText[*encodedTextLen + 1] = (unsigned char)'\0'; // The size is equal to `*encodedTextLen + 1` because the last element is for the '\0'.
 
-    int startElementIndex = 0;// The index of the starting element
-    int endElementIndex = 0;// The index of the last element
+    int startElementIndex = 0; // The index of the starting element
+    int endElementIndex = 0; // The index of the last element
     memset(inputBitBuffer, '\0', 2 * DECIMAL_BIT_STEP);
-    int remainder = 0;// The remainder elements in the stack
-    int transIndex = 0;// The index for inputBitBuffer
+    int remainder = 0; // The remainder elements in the stack
+    int transIndex = 0; // The index for inputBitBuffer
 
     // Loop over all plainText characters
     for (int i = 0; i < plainLen; i++) {
@@ -62,10 +63,10 @@ int UU_Encode_encoder(Encoder* oEncoder,
         for (int j = 0; j < DECIMAL_BIT_STEP; j++) {
             int index = (endElementIndex - j) % (2 * DECIMAL_BIT_STEP);
             int rightMostBit = decimal & 1;
-            inputBitBuffer[index] = (unsigned char)('0' + rightMostBit);// The bit
+            inputBitBuffer[index] = (unsigned char)('0' + rightMostBit); // The bit
             decimal = decimal >> 1; // Right shift a bit
         }
-        remainder += DECIMAL_BIT_STEP;// The remainder is equal to the elements which are pushed.
+        remainder += DECIMAL_BIT_STEP; // The remainder is equal to the elements which are pushed.
 
         // Fetch and become the char if the remainder is larger than or equal to UU_BIT_STEP
         for (; remainder >= UU_BIT_STEP;
@@ -84,7 +85,7 @@ int UU_Encode_encoder(Encoder* oEncoder,
 
     // If the remainder is not equal to 0, the last element shall be encoded with 0-bit(s).
     if (remainder != 0) {
-        int lastElement = 0;// The value of the last element
+        int lastElement = 0; // The value of the last element
         for (int j = 0, k = startElementIndex; j < remainder; j++, k++) {
             k = k % (2 * DECIMAL_BIT_STEP);
             lastElement += ((inputBitBuffer[k] - '0') << (UU_BIT_STEP - j - 1));
@@ -112,7 +113,7 @@ int UU_Encode_encoder(Encoder* oEncoder,
     memcpy(tmp + numLength + 1, encodedText, finalLength);
     memcpy(encodedText, tmp, finalLength + numLength + 1);
     encodedText[finalLength + numLength + 1] = (unsigned char)'\0';
-    *encodedTextLen  +=  (numLength + 1);
+    *encodedTextLen += (numLength + 1);
     free(tmp);
     return 200;
 }
@@ -160,11 +161,11 @@ static int UU_Encode_decoder(Encoder* oEncoder,
     // The length of the array is equal to *encodedLen + 1 (the last element is for the '\0'.)
     plainText[*plainTextLen + 1] = (unsigned char)'\0';
 
-    int startElementIndex = 0;// The index of the starting element
-    int endElementIndex = 0;// The index of the last element
+    int startElementIndex = 0; // The index of the starting element
+    int endElementIndex = 0; // The index of the last element
     memset(inputBitBuffer, '\0', 2 * UU_BIT_STEP);
-    int remainder = 0;// The remainder elements in the stack
-    int transIndex = 0;// The index for inputBitBuffer
+    int remainder = 0; // The remainder elements in the stack
+    int transIndex = 0; // The index for inputBitBuffer
 
     for (int i = 0; i < encodedLen; i++) {
         // If the element is equal to the char(96), "`" in six-encoded result, the value is equal to the 0.

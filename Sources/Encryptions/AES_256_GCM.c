@@ -1,7 +1,7 @@
 #include "../../Headers/Encryptions/AES_256_GCM.h"
 
-static int AES_256_GCM_encryption(Encryption*, const unsigned char*, const int, unsigned char*, int*, unsigned char*);
-static int AES_256_GCM_decryption(Encryption*, unsigned char*, int, unsigned char*, int*, unsigned char*);
+static int AES_256_GCM_encryption(Encryption*, const unsigned char*, const int, unsigned char*, int*);
+static int AES_256_GCM_decryption(Encryption*, unsigned char*, int, unsigned char*, int*);
 static int AES_256_GCM_initializeMasterKey(Encryption*);
 static int AES_256_GCM_setProjectPath(Encryption*, unsigned char*);
 static int AES_256_GCM_generateMasterKey(AES_256_GCM*);
@@ -49,7 +49,6 @@ void AES_256_GCM__destructor(const AES_256_GCM* a2gObject)
  * @param plaintextLen const int The length of the plaintext string
  * @param ciphertext unsigned char* The ciphertext
  * @param ciphertextLen int* The length of the ciphertext string
- * @param authTag unsigned char* The authentication tag
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
@@ -58,12 +57,12 @@ static int AES_256_GCM_encryption(
     const unsigned char* plaintext,
     const int plaintextLen,
     unsigned char* ciphertext,
-    int* ciphertextLen,
-    unsigned char* authTag)
+    int* ciphertextLen)
 {
     int httpStatus = 500;
     AES_256_GCM* pA2gObject = (AES_256_GCM*)pEnc;
     unsigned char const* key = pA2gObject->masterKey;
+    unsigned char authTag[AES_256_GCM_TAG_SIZE];// The tag for the ciphertext which can verify if the ciphertext had been modified in connection.
 
     httpStatus = AES_256_GCM_checkFileExisted(pA2gObject);
     if (httpStatus != 200) {
@@ -161,7 +160,6 @@ static int AES_256_GCM_encryption(
  * @param ciphertextLen const int The length of the ciphertext string
  * @param plaintext unsigned char* The plaintext for the encryption
  * @param plaintextLen int* The length of the plaintext string
- * @param authTag unsigned char* The authentication tag
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
@@ -170,12 +168,13 @@ static int AES_256_GCM_decryption(
     unsigned char* ciphertext,
     int ciphertextLen,
     unsigned char* plaintext,
-    int* plaintextLen,
-    unsigned char* authTag)
+    int* plaintextLen
+    )
 {
 
     AES_256_GCM* pA2gObject = (AES_256_GCM*)pEnc;
     unsigned char const* key = pA2gObject->masterKey;
+    unsigned char authTag[AES_256_GCM_TAG_SIZE];// The tag for the ciphertext which can verify if the ciphertext had been modified in connection.
 
     int httpStatus = 500;
     httpStatus = AES_256_GCM_checkFileExisted(pA2gObject);
@@ -264,7 +263,7 @@ static int AES_256_GCM_decryption(
     if (decryptedStatus > 0) {
         return 200;
     } else {
-        fprintf(stderr, "decryptedStatus error\n");
+        fprintf(stderr, "decrypted Status error\n");
         return 500;
     }
 }

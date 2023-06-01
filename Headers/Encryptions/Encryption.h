@@ -17,8 +17,8 @@ typedef struct Encryption Encryption;
 struct Encryption {
 
   // Public variables to constructor/destructor functions
-  int (*pf__encryption)(Encryption*, const unsigned char*, const int, unsigned char*, int*, unsigned char*);
-  int (*pf__decryption)(Encryption*, unsigned char*, int, unsigned char*, int*, unsigned char*);
+  int (*pf__encryption)(Encryption*, const unsigned char*, const int, unsigned char*, int*);
+  int (*pf__decryption)(Encryption*, unsigned char*, int, unsigned char*, int*);
   int (*pf__initializeServerKey)(Encryption*);
   int (*pf__setProjectPath)(Encryption*, unsigned char*);
 };

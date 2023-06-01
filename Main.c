@@ -41,7 +41,6 @@ int main(int argc, char* argv[])
 
     int iLen = 0;
     unsigned char buffer[2060];
-    unsigned char tag[16];
     memset(buffer, '\0', 2060);
     unsigned char* str = (unsigned char*)"bbbbbb is apple;a is apple;a is apple;a is apple;a is apple;a is apple;a is apple;a is apple;a is apple;a is apple;a is apple;a is apple;a is apple;a is apple;a is apple;";
     iHttpNum = 0;
@@ -52,7 +51,6 @@ int main(int argc, char* argv[])
         (int)strlen((char*)str),
         buffer,
         &iLen,
-        tag,
         (unsigned char*)"AES_256_GCM");
 
     if (iHttpNum == 200) {
@@ -64,7 +62,6 @@ int main(int argc, char* argv[])
     printf("========================================================\n");
     unsigned char decryptedBuffer[2060];
     memset(decryptedBuffer, '\0', 2060);
-    unsigned char tag2[16];
     int iDLen = 0;
 
     iHttpNum = ___decryption(
@@ -72,7 +69,6 @@ int main(int argc, char* argv[])
         iLen,
         decryptedBuffer,
         &iDLen,
-        tag2,
         (unsigned char*)"AES_256_GCM");
 
     printf("HttpNum is %d\n", iHttpNum);

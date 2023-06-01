@@ -11,7 +11,6 @@ static EncoderDispatcher __encoderDispatcherObject__;
  * @param plaintextLen const int The length of the source string
  * @param ciphertext unsigned char* The ciphertext
  * @param ciphertextLen int* The length of the ciphertext string
- * @param authTag unsigned char* The authentication tag
  * @param approach unsigned char* The approaches for encryption;
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
@@ -21,7 +20,6 @@ int ___encryption(
         const int plaintextLen,
         unsigned char* ciphertext,
         int* ciphertextLen,
-        unsigned char* tag,
         unsigned char* approach) {
 
     if(__encryptionDispatcherObject__.isInitialized != 1) {
@@ -34,7 +32,6 @@ int ___encryption(
         plaintextLen,
         ciphertext,
         ciphertextLen,
-        tag,
         approach
     );
     return httpStatus;
@@ -47,7 +44,6 @@ int ___encryption(
  * @param ciphertextLen int The length of the ciphertext string
  * @param plaintext unsigned char* The plaintext
  * @param plaintextLen int* The length of the plaintext
- * @param tag unsigned char* The authentication tag
  * @param approach unsigned char* The approaches for decryption
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
@@ -57,7 +53,6 @@ int ___decryption(
     int ciphertextLen,
     unsigned char* plaintext,
     int* plaintextLen,
-    unsigned char* tag,
     unsigned char* approach) {
 
     if(__encryptionDispatcherObject__.isInitialized != 1) {
@@ -69,7 +64,6 @@ int ___decryption(
         ciphertextLen,
         plaintext,
         plaintextLen,
-        tag,
         approach
     );
     return httpStatus;
