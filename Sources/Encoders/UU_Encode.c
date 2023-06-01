@@ -1,7 +1,7 @@
 #include "../../Headers/Encoders/UU_Encode.h"
 
-static int UU_Encode_encoder(Encoder*, const unsigned char*, int, unsigned char*, int*);
-static int UU_Encode_decoder(Encoder*, const unsigned char*, int, unsigned char*, int*);
+static int UU_Encode_encoder(const Encoder*, const unsigned char*, int, unsigned char*, int*);
+static int UU_Encode_decoder(const Encoder*, const unsigned char*, int, unsigned char*, int*);
 
 // Method definitions
 void UU_Encode__constructor(UU_Encode* oUuEncoder)
@@ -31,7 +31,7 @@ void UU_Encode__destructor(const UU_Encode*)
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
-int UU_Encode_encoder(Encoder* oEncoder,
+static int UU_Encode_encoder(const Encoder* oEncoder,
     const unsigned char* plainText, int plainLen, unsigned char* encodedText, int* encodedTextLen)
 {
     /*
@@ -106,7 +106,7 @@ int UU_Encode_encoder(Encoder* oEncoder,
  * @param plainTextLen int* The length of the plainText; the variable belongs to called-by the value of the address
  * @return
  */
-static int UU_Encode_decoder(Encoder* oEncoder,
+static int UU_Encode_decoder(const Encoder* oEncoder,
     const unsigned char* encodedText, int encodedLen, unsigned char* plainText, int* plainTextLen)
 {
     const unsigned char* encodedStart = encodedText;
