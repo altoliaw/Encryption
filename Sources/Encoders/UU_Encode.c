@@ -131,8 +131,7 @@ static int UU_Encode_decoder(Encoder* oEncoder,
     unsigned char* encodedText, int encodedLen, unsigned char* plainText, int* plainTextLen)
 {
     // Setting the starting encoding position and recalculating the length of the encoded text
-    char* pipePos;
-    pipePos = strchr((char*)encodedText, '|');
+    const char* pipePos = strchr((char*)encodedText, '|');
     if (pipePos == NULL) {
         fprintf(stderr, "The pipe symbol does not exist.\n");
         return 500;
@@ -143,7 +142,7 @@ static int UU_Encode_decoder(Encoder* oEncoder,
     numStr[numLength] = (unsigned char)'\0';
 
     int encodedLength = atoi((char*)numStr);
-    unsigned char* encodedStart = encodedText + numLength + 1;
+    const unsigned char* encodedStart = encodedText + numLength + 1;
 
     if (encodedLength != (encodedLen -= (numLength + 1))) {
         fprintf(stderr, "The length are not equal to the integer of the first char%d, %d\n", encodedLength, encodedLen);
@@ -189,7 +188,7 @@ static int UU_Encode_decoder(Encoder* oEncoder,
             int eightBitsResult = 0;
             for (int j = 0, k = startElementIndex; j < DECIMAL_BIT_STEP; j++, k++) {
                 k = k % (2 * UU_BIT_STEP);
-                eightBitsResult += ((int)(inputBitBuffer[k] - '0') << (DECIMAL_BIT_STEP - j - 1));
+                eightBitsResult += ((inputBitBuffer[k] - '0') << (DECIMAL_BIT_STEP - j - 1));
             }
             plainText[transIndex++] = (char)eightBitsResult;
         }

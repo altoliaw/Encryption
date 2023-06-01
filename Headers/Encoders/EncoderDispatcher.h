@@ -25,7 +25,7 @@ struct EncoderDispatcher {
 
 // Method definitions
 void EncoderDispatcher__constructor(EncoderDispatcher*);
-void EncoderDispatcher__destructor(EncoderDispatcher*);
+void EncoderDispatcher__destructor(const EncoderDispatcher*);
 
 // External functions
 extern void UU_Encode__constructor(UU_Encode*);
