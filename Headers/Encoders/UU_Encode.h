@@ -1,5 +1,5 @@
 #pragma once
-/**
+/** @file UU_Encode.h
  * The UU_Encoded encoder and decoder,the algorithm of the UU encoder can be referred
  * in the following URL. {@url: https://en.wikipedia.org/wiki/Uuencoding}
  * (The algorithm in the URL belongs to the English version. Please refer to the English version
@@ -18,8 +18,10 @@
 // Files included
 #include "Encoder.h"
 
-// Definitions
+// Macro Definitions
+// UUencode bit size
 #define UU_BIT_STEP 6
+// Traditional bit size
 #define DECIMAL_BIT_STEP 8
 
 // Class declarations
@@ -27,10 +29,16 @@ typedef struct UU_Encode UU_Encode;
 
 // Class body
 struct UU_Encode {
+    // A flag to determine if the class is initialized
     int isInitialized;
+
+    // An interface of UU_Encode
     Encoder oEncoder;
 
+    // Pointer to the encode function
     int (*pf__encode)(char*, int, char*, int*);
+
+    // Pointer to the decode function
     int (*pf__decode)(char*, int, char*, int*);
 };
 

@@ -1,5 +1,5 @@
 #pragma once
-/**
+/** @file Entry.h
  * Definitions of functions as entries as API
  *
  * @author Nick

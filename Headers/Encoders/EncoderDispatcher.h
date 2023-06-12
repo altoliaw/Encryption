@@ -1,5 +1,5 @@
 #pragma once
-/**
+/** @file EncoderDispatcher.h
  * The dispatcher of the encoder
  *
  * @author Nick
@@ -17,9 +17,12 @@ typedef struct EncoderDispatcher EncoderDispatcher;
 
 // Class body
 struct EncoderDispatcher {
+  // A flag to determine if the class is initialized
   int isInitialized;
 
+  // Pointer to the encoder function
   int (*pf__encoder)(const unsigned char*, int, unsigned char*, int*, unsigned char*);
+  // Pointer to the decoder function
   int (*pf__decoder)(const unsigned char*, int, unsigned char*, int*, unsigned char*);
 };
 
