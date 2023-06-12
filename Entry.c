@@ -3,6 +3,51 @@
 // Global variable
 static EncryptionDispatcher __encryptionDispatcherObject__;
 static EncoderDispatcher __encoderDispatcherObject__;
+
+/**
+ * AES_256_GCM encryption; the length of the ciphertext is equal to the length of the
+ * plaintext plus 28 which is the sum from the IV value(12) and the auth tag(16).
+ *
+ * @param plainText unsigned char* The plain text
+ * @param plainTextLen int The length of the plain text
+ * @param ciphertext unsigned char* The encrypted text; the size of the array shall be allocated in advance
+ * @return int HTTP response status codes, more information can be referred
+ * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+ */
+int ___AES_256_GCM(
+    const unsigned char* plainText,
+    const int plainTextLen,
+    unsigned char* ciphertext
+    )
+{
+    int httpStatus = 200;
+    unsigned char ciphertext[plainTextLen + AES_256_GCM_IV_SIZE + AES_256_GCM_TAG_SIZE + 1];
+    int ciphertextLen = 0;
+    httpStatus = ___encryption(plainText, plainTextLen, ciphertext, &ciphertextLen, (unsigned char*)"AES_256_GCM");
+    return httpStatus;
+}
+
+/**
+ * AES_256_GCM decryption; the length of the plaintext is equal to the length of the
+ * ciphertext minus 28 which is the sum from the IV value(12) and the auth tag(16).
+ *
+ * @param ciphertext unsigned char* The cipher text; the size of the array shall be allocated in advance
+ * @param ciphertextLen int The length of the encrypted text
+ * @param plainText unsigned char* The plain text; the size of the array shall be allocated in advance
+ * @return int HTTP response status codes, more information can be referred
+ * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+ */
+int ___AES_256_GCM(
+    const unsigned char* ciphertext,
+    const int ciphertextLen,
+    unsigned char* plainText)
+{
+    int httpStatus = 200;
+    int plainTextLen = 0;
+    httpStatus = ___decryption(ciphertext, ciphertextLen, plainText, &plainTextLen, (unsigned char*)"AES_256_GCM");
+    return httpStatus;
+}
+
 /**
  * AES_256_GCM encryption with UUencode
  *

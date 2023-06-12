@@ -17,6 +17,9 @@
   // AES_256_GCM + UUEncoding
   EXPORT int ___AES_256_GCMWithUUEncode(const unsigned char*, const int, unsigned char*, int*);
   EXPORT int ___AES_256_GCMWithUUDecode(const unsigned char*, const int, unsigned char*, int*);
+  // AES_256_GCM + UUEncoding
+  EXPORT int ___AES_256_GCM(const unsigned char*, const int, unsigned char*);
+  EXPORT int ___AES_256_GCM(const unsigned char*, const int, unsigned char*);
   // Encryption
   EXPORT int ___encryption(const unsigned char*, const int, unsigned char*, int*, unsigned char*);
   EXPORT int ___decryption(unsigned char*, int, unsigned char*, int*, unsigned char*);
@@ -30,6 +33,10 @@
   // AES_256_GCM + UUEncoding
   __attribute__((visibility("default"))) int ___AES_256_GCMWithUUEncode(const unsigned char*, const int, unsigned char*, int*);
   __attribute__((visibility("default"))) int ___AES_256_GCMWithUUDecode(const unsigned char*, const int, unsigned char*, int*);
+
+  // AES_256_GCM
+  __attribute__((visibility("default"))) int ___AES_256_GCM(const unsigned char*, const int, unsigned char*);
+  __attribute__((visibility("default"))) int ___AES_256_GCM(const unsigned char*, const int, unsigned char*);
 
   // Encryption
   __attribute__((visibility("default"))) int ___encryption(const unsigned char*, const int, unsigned char*, int*, unsigned char*);
