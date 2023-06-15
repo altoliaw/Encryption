@@ -14,14 +14,13 @@ static EncoderDispatcher __encoderDispatcherObject__;
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
-int ___AES_256_GCM(
+int ___AES_256_GCM_encryption(
     const unsigned char* plainText,
     const int plainTextLen,
     unsigned char* ciphertext
     )
 {
     int httpStatus = 200;
-    unsigned char ciphertext[plainTextLen + AES_256_GCM_IV_SIZE + AES_256_GCM_TAG_SIZE + 1];
     int ciphertextLen = 0;
     httpStatus = ___encryption(plainText, plainTextLen, ciphertext, &ciphertextLen, (unsigned char*)"AES_256_GCM");
     return httpStatus;
@@ -37,7 +36,7 @@ int ___AES_256_GCM(
  * @return int HTTP response status codes, more information can be referred
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
-int ___AES_256_GCM(
+int ___AES_256_GCM_decryption(
     const unsigned char* ciphertext,
     const int ciphertextLen,
     unsigned char* plainText)

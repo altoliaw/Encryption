@@ -6,7 +6,7 @@
 int main(int argc, char* argv[])
 {
     int iHttpNum = 0;
-    unsigned char plainText [] = "Catagg44`\0";
+    unsigned char plainText [] = "Cat`\0";
     int plainTextLen = (int)strlen((char*)plainText);
     unsigned char encodedText [200];
     int encodedTextLen = 0;

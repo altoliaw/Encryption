@@ -6,7 +6,7 @@ Sources=${Prdir}/Sources
 # Setting of the general compiled grammer
 ## The Compiler, library, level of the compiler optimization, detected information, wall and message
 Cmp=gcc
-Stdlib=-std=c99
+Stdlib=-std=c11
 Cmpopt=-O3
 Detinfo=-g3
 Wall=-Wall
