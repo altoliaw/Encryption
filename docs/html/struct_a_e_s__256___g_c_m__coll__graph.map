@@ -1,0 +1,7 @@
+<map id="AES_256_GCM" name="AES_256_GCM">
+<area shape="rect" id="Node000001" title=" " alt="" coords="57,93,173,119"/>
+<area shape="rect" id="Node000002" href="$struct_encryption.html" title=" " alt="" coords="5,5,96,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="54,44,62,68,74,81,89,91,86,95,71,85,58,71,49,46"/>
+<area shape="rect" id="Node000003" href="$struct_file_generation.html" title=" " alt="" coords="120,5,237,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="168,45,151,71,129,95,125,91,147,68,164,42"/>
+</map>
