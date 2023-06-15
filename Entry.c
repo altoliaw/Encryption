@@ -37,7 +37,7 @@ int ___AES_256_GCM_encryption(
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
 int ___AES_256_GCM_decryption(
-    const unsigned char* ciphertext,
+    unsigned char* ciphertext,
     const int ciphertextLen,
     unsigned char* plainText)
 {
@@ -88,7 +88,7 @@ int ___AES_256_GCMWithUUEncode(
  * in the following URL: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
  */
 int ___AES_256_GCMWithUUDecode(
-    const unsigned char* encodedText,
+    unsigned char* encodedText,
     const int encodedTextLen,
     unsigned char* plainText,
     int* plainTextLen)

@@ -16,10 +16,10 @@
   #define EXPORT __declspec(dllexport)
   // AES_256_GCM + UUEncoding
   EXPORT int ___AES_256_GCMWithUUEncode(const unsigned char*, const int, unsigned char*, int*);
-  EXPORT int ___AES_256_GCMWithUUDecode(const unsigned char*, const int, unsigned char*, int*);
+  EXPORT int ___AES_256_GCMWithUUDecode(unsigned char*, const int, unsigned char*, int*);
   // AES_256_GCM + UUEncoding
   EXPORT int ___AES_256_GCM_encryption(const unsigned char*, const int, unsigned char*);
-  EXPORT int ___AES_256_GCM_decryption(const unsigned char*, const int, unsigned char*);
+  EXPORT int ___AES_256_GCM_decryption(unsigned char*, const int, unsigned char*);
   // Encryption
   EXPORT int ___encryption(const unsigned char*, const int, unsigned char*, int*, unsigned char*);
   EXPORT int ___decryption(unsigned char*, int, unsigned char*, int*, unsigned char*);
@@ -32,11 +32,11 @@
 #else
   // AES_256_GCM + UUEncoding
   __attribute__((visibility("default"))) int ___AES_256_GCMWithUUEncode(const unsigned char*, const int, unsigned char*, int*);
-  __attribute__((visibility("default"))) int ___AES_256_GCMWithUUDecode(const unsigned char*, const int, unsigned char*, int*);
+  __attribute__((visibility("default"))) int ___AES_256_GCMWithUUDecode(unsigned char*, const int, unsigned char*, int*);
 
   // AES_256_GCM
   __attribute__((visibility("default"))) int ___AES_256_GCM_encryption(const unsigned char*, const int, unsigned char*);
-  __attribute__((visibility("default"))) int ___AES_256_GCM_decryption(const unsigned char*, const int, unsigned char*);
+  __attribute__((visibility("default"))) int ___AES_256_GCM_decryption(unsigned char*, const int, unsigned char*);
 
   // Encryption
   __attribute__((visibility("default"))) int ___encryption(const unsigned char*, const int, unsigned char*, int*, unsigned char*);
