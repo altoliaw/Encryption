@@ -1,0 +1,3 @@
+add_subdirectory(Encoders)
+add_subdirectory(Encryptions)
+add_subdirectory(FileGenerations)

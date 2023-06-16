@@ -14,7 +14,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 // Files included
 #include "Encoder.h"
 
@@ -34,12 +33,6 @@ struct UU_Encode {
 
     // An interface of UU_Encode
     Encoder oEncoder;
-
-    // Pointer to the encode function
-    int (*pf__encode)(char*, int, char*, int*);
-
-    // Pointer to the decode function
-    int (*pf__decode)(char*, int, char*, int*);
 };
 
 // Method declarations

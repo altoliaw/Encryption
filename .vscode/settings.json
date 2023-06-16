@@ -12,7 +12,9 @@
         "encryption.h": "c",
         "uu_encode.h": "c",
         "encoder.h": "c",
-        "encoderdispatcher.h": "c"
+        "encoderdispatcher.h": "c",
+        "test_encoders_uu_encode.h": "c",
+        "test_entry.h": "c"
     },
     "sonarlint.pathToCompileCommands": "${workspaceFolder}/.vscode/compile_commands.json",
     "C_Cpp.errorSquiggles": "disabled"

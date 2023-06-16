@@ -35,6 +35,11 @@ clean:
 	rm -rf ${Prdir}/${PjN}
 	rm -rf ${Prdir}/*.o
 
+.Phony: cmakeClean
+cmakeClean:
+	clear
+	rm -rf ${Prdir}/build/*
+
 .Phony: run
 run:
 	${Prdir}/${PjN}
