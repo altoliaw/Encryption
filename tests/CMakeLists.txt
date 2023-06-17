@@ -1,7 +1,7 @@
 add_executable(Tests
     ./Main.c
     ./Sources/test_Encoders_UU_Encoder.c
-#    ./Sources/test_Entry.c
+    ./Sources/test_Entry.c
 )
 
 target_include_directories(Tests PUBLIC ./Headers)

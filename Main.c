@@ -29,32 +29,6 @@ int main(int argc, char* argv[])
     fprintf(stderr, "decodedText = %s and total length = %d\n", plainText2, plainText2Len);
 
 
-    /*
-    unsigned char plainText [] = "Catagg44`\0";
-    int plainTextLen = (int)strlen((char*)plainText);
-    unsigned char encodedText [200];
-    int encodedTextLen = 0;
-
-    iHttpNum = ___encoder(plainText,
-        plainTextLen,
-        encodedText,
-        &encodedTextLen,
-        (unsigned char *)"UU_Encode");
-    fprintf(stderr, "iHttpNum = %d\n", iHttpNum);
-    fprintf(stderr, "encodedText = %s and total length = %d\n", encodedText, encodedTextLen);
-    //==========================
-    unsigned char plainText2 [200];
-    int plainText2Len = 0;
-    int encodedTextLen2 = (int)strlen((char*)encodedText);
-    iHttpNum = ___decoder(encodedText,
-        encodedTextLen2,
-        plainText2,
-        &plainText2Len,
-        (unsigned char *)"UU_Encode");
-    fprintf(stderr, "iHttpNum = %d\n", iHttpNum);
-    fprintf(stderr, "decodedText = %s and total length = %d\n", plainText2, plainText2Len);
-    */
-
     // ===========================
     // unsigned char* projectPath = (unsigned char*)"/home/nick/Workspace/C/Encryption";
     // iHttpNum = ___setProjectPath((unsigned char*)"AES_256_GCM", projectPath);
