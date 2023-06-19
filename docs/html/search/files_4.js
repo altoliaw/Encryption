@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['main_2ec_0',['Main.c',['../_main_8c.html',1,'']]]
+  ['header_2eh_0',['Header.h',['../_headers_2_header_8h.html',1,'(Global Namespace)'],['../tests_2_headers_2_header_8h.html',1,'(Global Namespace)']]]
 ];
